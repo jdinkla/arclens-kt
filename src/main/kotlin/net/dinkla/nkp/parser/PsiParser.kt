@@ -15,12 +15,11 @@ import java.io.File
 
 /**
  * Parser implementation using JetBrains PSI (kotlin-compiler-embeddable).
- * This parser is significantly faster than the ANTLR-based grammar-tools parser.
  */
-class PsiParser : KotlinParser {
+class PsiParser {
     private val environment: KotlinCoreEnvironment by lazy { createKotlinCoreEnvironment() }
 
-    override fun parseFile(
+    fun parseFile(
         filePath: String,
         prefix: String,
     ): Result<KotlinFile> =

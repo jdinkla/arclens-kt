@@ -5,11 +5,9 @@ import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.convert
 import com.github.ajalt.clikt.parameters.arguments.optional
-import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.split
-import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.file
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
@@ -22,9 +20,6 @@ import net.dinkla.nkp.extract.ChangeStatus
 import net.dinkla.nkp.extract.detectChanges
 import net.dinkla.nkp.extract.filterFilesToParse
 import net.dinkla.nkp.extract.reuseFromCache
-import net.dinkla.nkp.parser.GrammarToolsParser
-import net.dinkla.nkp.parser.KotlinParser
-import net.dinkla.nkp.parser.ParserType
 import net.dinkla.nkp.parser.PsiParser
 import net.dinkla.nkp.utilities.getAllKotlinFiles
 import java.io.File
@@ -58,18 +53,7 @@ class Parse : CliktCommand(name = "parse") {
         help = "Force full parse, ignoring cached results",
     ).flag(default = false)
 
-    private val parserType by option(
-        "--parser",
-        "-p",
-        help = "Parser to use: PSI (faster, default) or GRAMMAR (ANTLR-based)",
-    ).enum<ParserType>().default(ParserType.PSI)
-
-    private val parser: KotlinParser by lazy {
-        when (parserType) {
-            ParserType.PSI -> PsiParser()
-            ParserType.GRAMMAR -> GrammarToolsParser()
-        }
-    }
+    private val parser: PsiParser by lazy { PsiParser() }
 
     override fun run() {
         if (!full && target?.exists() == true) {
@@ -201,7 +185,7 @@ class Parse : CliktCommand(name = "parse") {
 
 private fun readFiles(
     directory: File,
-    parser: KotlinParser,
+    parser: PsiParser,
 ): List<Result<KotlinFile>> {
     val files = getAllKotlinFiles(directory)
     return runBlocking(Dispatchers.IO) {
@@ -223,7 +207,7 @@ private fun readFiles(
 private fun readFilesSelective(
     directory: File,
     filesToParse: List<File>,
-    parser: KotlinParser,
+    parser: PsiParser,
 ): List<Result<KotlinFile>> {
     val directoryPath = directory.absolutePath
     val filesInDirectory = filesToParse.filter { it.absolutePath.startsWith(directoryPath) }

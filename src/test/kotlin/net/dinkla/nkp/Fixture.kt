@@ -19,16 +19,11 @@ import net.dinkla.nkp.domain.kotlinlang.PropertyModifier
 import net.dinkla.nkp.domain.kotlinlang.Type
 import net.dinkla.nkp.domain.kotlinlang.TypeAlias
 import net.dinkla.nkp.domain.kotlinlang.VisibilityModifier
-import net.dinkla.nkp.utilities.fromFile
 import java.io.File
 
 const val EXAMPLE_MODEL = "src/test/resources/model.json"
 val EXAMPLE_MODEL_FILE = File(EXAMPLE_MODEL)
 val SOURCE_DIRECTORY = File("src/examples/kotlin/examples")
-
-private const val KOTLIN_EXAMPLE_FILE = "src/examples/kotlin/examples/HelloWorld.kt"
-
-internal val tree = fromFile(KOTLIN_EXAMPLE_FILE)
 
 internal val expectedImports =
     listOf(

@@ -11,14 +11,13 @@ version = "0.1"
 
 repositories {
     mavenCentral()
-    mavenLocal()
 }
 
 dependencies {
     implementation(project(":"))
     implementation(libs.kotlinx.serialization)
     implementation(libs.kotlinx.coroutines)
-    implementation(libs.kotlin.grammar.tools)
+    implementation(libs.kotlin.compiler.embeddable)
 }
 
 gradlePlugin {

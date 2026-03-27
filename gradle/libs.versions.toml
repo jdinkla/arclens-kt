@@ -16,7 +16,6 @@ kotlin-logging-jvm = "7.0.14"
 slf4j-api = "2.0.17"
 logback-classic = "1.5.27"
 kotest = "6.1.2"
-kotlin-grammar-tools = "0.1"
 kotlin-compiler = "2.3.0"
 detekt = "1.23.8"
 ktlint = "14.0.1"
@@ -34,5 +33,4 @@ slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j-api" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback-classic" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
-kotlin-grammar-tools = { module = "org.jetbrains.kotlin.spec.grammar.tools:kotlin-grammar-tools", version.ref = "kotlin-grammar-tools" }
 kotlin-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin-compiler" }

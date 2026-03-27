@@ -13,7 +13,6 @@ version = "0.1"
 
 repositories {
     mavenCentral()
-    mavenLocal()
 }
 
 dependencies {
@@ -21,7 +20,6 @@ dependencies {
     implementation(libs.kotlinx.coroutines)
     implementation(libs.kotlinx.serialization)
     implementation(libs.clikt)
-    implementation(libs.kotlin.grammar.tools)
     implementation(libs.kotlin.compiler.embeddable)
     implementation(libs.kotlin.logging.jvm)
     implementation(libs.slf4j.api)

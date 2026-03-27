@@ -4,11 +4,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
-import net.dinkla.nkp.domain.FilePath
 import net.dinkla.nkp.domain.kotlinlang.KotlinFile
 import net.dinkla.nkp.domain.kotlinlang.Project
-import net.dinkla.nkp.extract.extract
-import net.dinkla.nkp.utilities.fromFile
+import net.dinkla.nkp.parser.PsiParser
 import net.dinkla.nkp.utilities.getAllKotlinFiles
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
@@ -22,6 +20,8 @@ import java.io.File
  * Task that parses Kotlin source files and generates an analysis model.
  */
 abstract class NkpParseTask : DefaultTask() {
+    private val parser = PsiParser()
+
     @get:Input
     abstract val sourceDirs: ListProperty<File>
 
@@ -75,9 +75,7 @@ abstract class NkpParseTask : DefaultTask() {
         prefix: String,
     ): Result<KotlinFile> =
         try {
-            val withoutPrefix = fileName.removePrefix(prefix)
-            val analysedFile = extract(FilePath(withoutPrefix), fromFile(fileName))
-            Result.success(analysedFile)
+            parser.parseFile(fileName, prefix)
         } catch (e: Exception) {
             val message = "parsing '$fileName' yields ${e.message}"
             logger.debug("NKP: $message")
