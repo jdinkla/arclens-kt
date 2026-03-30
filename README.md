@@ -1,6 +1,6 @@
-# kotlin-nkp
+# arclens-kt
 
-Kotlin-NKP is a static analysis tool for Kotlin programs (nkp stands for aNalysis of Kotlin Programs). 
+arclens-kt is a static analysis tool for Kotlin programs (formerly kotlin-nkp).
 
 ## Introduction
 

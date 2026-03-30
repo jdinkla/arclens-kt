@@ -1,10 +1,10 @@
 # AGENTS.md
 
-This document provides guidance for AI agents working on the **kotlin-nkp** repository. 
+This document provides guidance for AI agents working on the **arclens-kt** repository.
 
 ## Project Overview
 
-**kotlin-nkp** (aNalysis of Kotlin Programs) is a static analysis tool for Kotlin programs. It analyzes package dependencies, class hierarchies, and import relationships to generate metrics and visual diagrams for architectural assessment.
+**arclens-kt** (formerly kotlin-nkp) is a static analysis tool for Kotlin programs. It analyzes package dependencies, class hierarchies, and import relationships to generate metrics and visual diagrams for architectural assessment.
 
 ## Tech Stack
 

@@ -13,7 +13,7 @@ plugins {
     id("de.fayard.refreshVersions") version "0.60.6"
 }
 
-rootProject.name = "kotlin-nkp"
+rootProject.name = "arclens-kt"
 
 include("gradle-plugin")
 

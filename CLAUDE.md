@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**kotlin-nkp** (aNalysis of Kotlin Programs) is a static analysis tool for Kotlin programs. It analyzes package dependencies, class hierarchies, and import relationships to generate metrics and visual diagrams (Mermaid format) for architectural assessment.
+**arclens-kt** (formerly kotlin-nkp) is a static analysis tool for Kotlin programs. It analyzes package dependencies, class hierarchies, and import relationships to generate metrics and visual diagrams (Mermaid format) for architectural assessment.
 
 ## Build Commands
 
