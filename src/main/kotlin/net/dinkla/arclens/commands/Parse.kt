@@ -10,18 +10,21 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.split
 import com.github.ajalt.clikt.parameters.types.file
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
-import net.dinkla.arclens.domain.kotlinlang.KotlinFile
 import net.dinkla.arclens.domain.kotlinlang.Project
 import net.dinkla.arclens.extract.ChangeStatus
+import net.dinkla.arclens.extract.buildProject
 import net.dinkla.arclens.extract.detectChanges
 import net.dinkla.arclens.extract.filterFilesToParse
+import net.dinkla.arclens.extract.formatIncrementalStatus
+import net.dinkla.arclens.extract.formatParseErrors
+import net.dinkla.arclens.extract.formatParseSummary
+import net.dinkla.arclens.extract.parseFiles
 import net.dinkla.arclens.extract.reuseFromCache
 import net.dinkla.arclens.parser.PsiParser
 import net.dinkla.arclens.utilities.getAllKotlinFiles
+import net.dinkla.arclens.utilities.loadJson
+import net.dinkla.arclens.utilities.saveJson
 import java.io.File
 
 class Parse : CliktCommand(name = "parse") {
@@ -65,12 +68,16 @@ class Parse : CliktCommand(name = "parse") {
 
     private fun runFull() {
         val allSources = listOf(source) + (additionalSources ?: emptyList())
-        val allFiles = allSources.flatMap { readFiles(it, parser) }
+        val allFiles =
+            allSources.flatMap { dir ->
+                parseFiles(getAllKotlinFiles(dir), dir.absolutePath, parser)
+            }
         if (!silent) {
-            reportErrors(allFiles)
+            formatParseSummary(allFiles)?.let { echo(it) }
+            formatParseErrors(allFiles)?.let { echo(it) }
         }
-        val project: Project = toProject(allSources, allFiles)
-        writeOutput(project)
+        val successFiles = allFiles.filter { it.isSuccess }.map { it.getOrThrow() }
+        writeOutput(buildProject(allSources, successFiles))
     }
 
     private fun runIncremental() {
@@ -86,7 +93,10 @@ class Parse : CliktCommand(name = "parse") {
 
         val parsedFiles =
             if (filesToParse.isNotEmpty()) {
-                allSources.flatMap { dir -> readFilesSelective(dir, filesToParse, parser) }
+                allSources.flatMap { dir ->
+                    val filesInDir = filesToParse.filter { it.absolutePath.startsWith(dir.absolutePath) }
+                    parseFiles(filesInDir.map { it.absolutePath }, dir.absolutePath, parser)
+                }
             } else {
                 emptyList()
             }
@@ -99,145 +109,34 @@ class Parse : CliktCommand(name = "parse") {
             }
 
         if (!silent) {
-            reportIncrementalStatus(parsedFiles, unchangedCount, deletedCount)
+            echo(formatIncrementalStatus(parsedFiles, unchangedCount, deletedCount))
+            if (parsedFiles.any { it.isFailure }) {
+                formatParseSummary(parsedFiles)?.let { echo(it) }
+                formatParseErrors(parsedFiles)?.let { echo(it) }
+            }
         }
 
         val allKotlinFiles = reusedFiles + parsedFiles.filter { it.isSuccess }.map { it.getOrThrow() }
-        val project =
-            Project(
-                directory = allSources.first().absolutePath,
-                files = allKotlinFiles,
-                directories = allSources.map { it.absolutePath },
-                parseTimestamp = System.currentTimeMillis(),
-            )
-        writeOutput(project)
+        writeOutput(buildProject(allSources, allKotlinFiles))
     }
 
     private fun loadCachedProject(): Project? =
         try {
             target?.let { file ->
-                if (file.exists()) {
-                    Json.decodeFromString<Project>(file.readText())
-                } else {
-                    null
-                }
+                if (file.exists()) file.loadJson<Project>() else null
             }
         } catch (e: Exception) {
             logger.warn { "Failed to load cached project: ${e.message}, falling back to full parse" }
             null
         }
 
-    private fun reportIncrementalStatus(
-        parsedFiles: List<Result<KotlinFile>>,
-        unchangedCount: Int,
-        deletedCount: Int,
-    ) {
-        val successCount = parsedFiles.count { it.isSuccess }
-        val errorCount = parsedFiles.count { it.isFailure }
-        val parts = mutableListOf<String>()
-        if (successCount > 0) parts.add("$successCount parsed")
-        if (errorCount > 0) parts.add("$errorCount exceptions")
-        if (unchangedCount > 0) parts.add("$unchangedCount unchanged")
-        if (deletedCount > 0) parts.add("$deletedCount deleted")
-        echo(parts.joinToString(", "))
-
-        if (errorCount > 0) {
-            reportErrors(parsedFiles)
-        }
-    }
-
     private fun writeOutput(project: Project) {
-        val json = Json.encodeToString(project)
         if (target != null) {
-            target!!.writeText(json)
+            target!!.saveJson(project)
         } else {
-            echo(json)
+            echo(Json.encodeToString(project))
         }
     }
-
-    private fun reportErrors(infos: List<Result<KotlinFile>>) {
-        if (infos.isEmpty()) return
-        val successCount = infos.count { it.isSuccess }
-        val failureCount = infos.count { it.isFailure }
-        if (successCount > 0 || failureCount > 0) {
-            echo(
-                infos
-                    .groupBy { it.isSuccess }
-                    .map {
-                        "${it.value.size} ${if (it.key) "ok" else "exceptions"}"
-                    }.joinToString(", "),
-            )
-        }
-        val failures = infos.filter { it.isFailure }
-        if (failures.isNotEmpty()) {
-            echo("ERROR: The following exceptions occurred:")
-            var count = 1
-            echo("------------------------------------------------------------------------------")
-            failures.forEach {
-                val exception = it.exceptionOrNull()
-                echo("${count++}. ${exception?.message}")
-                exception?.cause?.printStackTrace(System.out)
-                echo("------------------------------------------------------------------------------")
-            }
-        }
-    }
-}
-
-private fun readFiles(
-    directory: File,
-    parser: PsiParser,
-): List<Result<KotlinFile>> {
-    val files = getAllKotlinFiles(directory)
-    return runBlocking(Dispatchers.IO) {
-        files
-            .map { filePath ->
-                async {
-                    val startTime = System.currentTimeMillis()
-                    val result = parser.parseFile(filePath, directory.absolutePath)
-                    val elapsed = System.currentTimeMillis() - startTime
-                    logger.debug { "$filePath: total=${elapsed}ms" }
-                    result
-                }
-            }.map {
-                it.await()
-            }
-    }
-}
-
-private fun readFilesSelective(
-    directory: File,
-    filesToParse: List<File>,
-    parser: PsiParser,
-): List<Result<KotlinFile>> {
-    val directoryPath = directory.absolutePath
-    val filesInDirectory = filesToParse.filter { it.absolutePath.startsWith(directoryPath) }
-    return runBlocking(Dispatchers.IO) {
-        filesInDirectory
-            .map { file ->
-                async {
-                    val startTime = System.currentTimeMillis()
-                    val result = parser.parseFile(file.absolutePath, directoryPath)
-                    val elapsed = System.currentTimeMillis() - startTime
-                    logger.debug { "${file.absolutePath}: total=${elapsed}ms" }
-                    result
-                }
-            }.map {
-                it.await()
-            }
-    }
-}
-
-private fun toProject(
-    directories: List<File>,
-    infos: List<Result<KotlinFile>>,
-): Project {
-    val absolutePaths = directories.map { it.absolutePath }
-    return Project(
-        directory = absolutePaths.first(),
-        files = infos.filter { it.isSuccess }.map { it.getOrThrow() },
-        directories = absolutePaths,
-        parseTimestamp = System.currentTimeMillis(),
-    )
 }
 
 private val logger = KotlinLogging.logger {}
