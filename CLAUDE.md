@@ -16,10 +16,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ./gradlew test
 
 # Run a single test class
-./gradlew test --tests "net.dinkla.nkp.extract.ExtractTest"
+./gradlew test --tests "net.dinkla.arclens.extract.ExtractTest"
 
 # Run a single test method
-./gradlew test --tests "net.dinkla.nkp.extract.ExtractTest.extractSimpleIdentifier*"
+./gradlew test --tests "net.dinkla.arclens.extract.ExtractTest.extractSimpleIdentifier*"
 
 # Format code with ktlint
 ktlint -F src/
@@ -39,7 +39,7 @@ ktlint -F src/
 ### Package Structure
 
 ```
-net.dinkla.nkp
+net.dinkla.arclens
 ├── commands/          # CLI commands extending AbstractCommand
 ├── domain/
 │   ├── kotlinlang/   # Domain models: Project, Package, KotlinFile, ClassSignature, etc.
@@ -91,7 +91,7 @@ Enforced by detekt (zero violations allowed):
 
 - **Framework**: Kotest with `StringSpec` style
 - **Structure**: Given/When/Then comments
-- **Fixtures**: Reuse from `src/test/kotlin/net/dinkla/nkp/Fixture.kt`
+- **Fixtures**: Reuse from `src/test/kotlin/net/dinkla/arclens/Fixture.kt`
 
 ```kotlin
 class MyTest : StringSpec({

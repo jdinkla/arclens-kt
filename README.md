@@ -4,9 +4,9 @@ arclens-kt is a static analysis tool for Kotlin programs (formerly kotlin-nkp).
 
 ## Introduction
 
-**nkp** helps you understand and assess the architecture and structure of your Kotlin codebase by analyzing package dependencies, class hierarchies, and import relationships. It generates metrics and visual diagrams that aid in architectural decision-making, identifying coupling issues, and planning refactoring efforts.
+**arclens** helps you understand and assess the architecture and structure of your Kotlin codebase by analyzing package dependencies, class hierarchies, and import relationships. It generates metrics and visual diagrams that aid in architectural decision-making, identifying coupling issues, and planning refactoring efforts.
 
-### How to Use nkp
+### How to Use arclens
 
 1. **Parse your project** - Convert your Kotlin source code into an analyzable JSON model
 2. **Generate metrics** - Calculate package coupling, class statistics, and file-level metrics
@@ -54,15 +54,15 @@ arclens-kt is a static analysis tool for Kotlin programs (formerly kotlin-nkp).
 | Long method detection | | ❌ |
 | Deep inheritance detection | | ❌ |
 
-**Summary**: nkp excels at **architectural and structural analysis** (package coupling, dependencies, class hierarchies) but does not provide **code quality metrics** (complexity, size, code smells) or **temporal analysis** (change history, trends).
+**Summary**: arclens excels at **architectural and structural analysis** (package coupling, dependencies, class hierarchies) but does not provide **code quality metrics** (complexity, size, code smells) or **temporal analysis** (change history, trends).
 
 ## Features
 
-You can run the program with `bin/nkp.sh` or with `just run`.
+You can run the program with `bin/arclens.sh` or with `just run`.
 
 ```shell
-$ bin/nkp.sh -h 
-Usage: nkp [<options>] <command> [<args>]...
+$ bin/arclens.sh -h 
+Usage: arclens [<options>] <command> [<args>]...
 
 Options:
   -v, --version  Show the version and exit
@@ -115,7 +115,7 @@ $ bin/install-libs.sh
 The first step is to parse the files in a directory to a JSON file.
 
 ```sh
-$ bin/nkp.sh parse /repositories/ray-tracer-challenge/src/main/kotlin generated/model.json
+$ bin/arclens.sh parse /repositories/ray-tracer-challenge/src/main/kotlin generated/model.json
 ```
 
 ### Multi-Source Directory Support
@@ -123,7 +123,7 @@ $ bin/nkp.sh parse /repositories/ray-tracer-challenge/src/main/kotlin generated/
 For projects with multiple source directories (e.g., Kotlin Multiplatform), use the `--sources` option:
 
 ```sh
-$ bin/nkp.sh parse src/main/kotlin --sources=src/commonMain/kotlin,src/jvmMain/kotlin generated/model.json
+$ bin/arclens.sh parse src/main/kotlin --sources=src/commonMain/kotlin,src/jvmMain/kotlin generated/model.json
 ```
 
 Use this JSON file in the analysis steps as input.
@@ -132,39 +132,39 @@ Use this JSON file in the analysis steps as input.
 
 Generate a Mermaid class diagram:
 ```sh
-$ bin/nkp.sh mermaid-class-diagram generated/model.json > generated/class-diagram.mermaid
+$ bin/arclens.sh mermaid-class-diagram generated/model.json > generated/class-diagram.mermaid
 ```
 
 Generate statistics:
 ```sh
-$ bin/nkp.sh class-statistics generated/model.json > generated/class-statistics.json
-$ bin/nkp.sh file-statistics generated/model.json > generated/file-statistics.json
-$ bin/nkp.sh file-statistics --include-private-declarations generated/model.json > generated/file-statistics-full.json
-$ bin/nkp.sh package-statistics generated/model.json > generated/package-statistics.json
+$ bin/arclens.sh class-statistics generated/model.json > generated/class-statistics.json
+$ bin/arclens.sh file-statistics generated/model.json > generated/file-statistics.json
+$ bin/arclens.sh file-statistics --include-private-declarations generated/model.json > generated/file-statistics-full.json
+$ bin/arclens.sh package-statistics generated/model.json > generated/package-statistics.json
 ```
 
 Generate diagrams:
 ```sh
-$ bin/nkp.sh mermaid-import-diagram generated/model.json > generated/import-diagram.mermaid
-$ bin/nkp.sh mermaid-import-diagram --include-all-libraries generated/model.json > generated/import-diagram-all.mermaid
-$ bin/nkp.sh mermaid-coupling-diagram generated/model.json > generated/coupling-diagram.mermaid
-$ bin/nkp.sh mermaid-coupling-diagram --include-all-libraries generated/model.json > generated/coupling-diagram-all.mermaid
+$ bin/arclens.sh mermaid-import-diagram generated/model.json > generated/import-diagram.mermaid
+$ bin/arclens.sh mermaid-import-diagram --include-all-libraries generated/model.json > generated/import-diagram-all.mermaid
+$ bin/arclens.sh mermaid-coupling-diagram generated/model.json > generated/coupling-diagram.mermaid
+$ bin/arclens.sh mermaid-coupling-diagram --include-all-libraries generated/model.json > generated/coupling-diagram-all.mermaid
 ```
 
 Search for classes:
 ```sh
-$ bin/nkp.sh search generated/model.json MyClass
+$ bin/arclens.sh search generated/model.json MyClass
 ```
 
 Detect circular dependencies:
 ```sh
-$ bin/nkp.sh circular-dependencies generated/model.json > generated/circular-dependencies.json
-$ bin/nkp.sh circular-dependencies --include-all-libraries generated/model.json > generated/circular-dependencies-all.json
+$ bin/arclens.sh circular-dependencies generated/model.json > generated/circular-dependencies.json
+$ bin/arclens.sh circular-dependencies --include-all-libraries generated/model.json > generated/circular-dependencies-all.json
 ```
 
 List packages:
 ```sh
-$ bin/nkp.sh packages generated/model.json > generated/packages.json
+$ bin/arclens.sh packages generated/model.json > generated/packages.json
 ```
 
 ### Examples of the mermaid diagrams
@@ -183,7 +183,7 @@ $ bin/nkp.sh packages generated/model.json > generated/packages.json
 
 ## Gradle Plugin
 
-NKP is also available as a Gradle plugin for easy integration into your build process.
+arclens is also available as a Gradle plugin for easy integration into your build process.
 
 ### Installation
 
@@ -191,7 +191,7 @@ Add the plugin to your project's `build.gradle.kts`:
 
 ```kotlin
 plugins {
-    id("net.dinkla.nkp") version "0.1"
+    id("net.dinkla.arclens") version "0.1"
 }
 ```
 
@@ -200,15 +200,15 @@ plugins {
 ### Configuration
 
 ```kotlin
-nkp {
+arclens {
     // Source directories to analyze (defaults to src/main/kotlin)
     sourceDirs.set(listOf(
         file("src/main/kotlin"),
         file("src/commonMain/kotlin")
     ))
 
-    // Output directory (defaults to build/nkp)
-    outputDir.set(layout.buildDirectory.dir("nkp"))
+    // Output directory (defaults to build/arclens)
+    outputDir.set(layout.buildDirectory.dir("arclens"))
 
     // Configure which reports to generate
     reports {
@@ -230,18 +230,18 @@ nkp {
 
 | Task | Description |
 |------|-------------|
-| `nkp` | Run all NKP tasks (parse + analyze) |
-| `nkpParse` | Parse Kotlin source files and generate model.json |
-| `nkpAnalyze` | Run all configured analyses on the parsed model |
+| `arclens` | Run all arclens tasks (parse + analyze) |
+| `arclensParse` | Parse Kotlin source files and generate model.json |
+| `arclensAnalyze` | Run all configured analyses on the parsed model |
 
 ### Example
 
 ```sh
-# Run all NKP analysis
-./gradlew nkp
+# Run all arclens analysis
+./gradlew arclens
 
-# Output is in build/nkp/
-ls build/nkp/
+# Output is in build/arclens/
+ls build/arclens/
 # model.json class-statistics.json file-statistics.json ...
 ```
 

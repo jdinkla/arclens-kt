@@ -53,7 +53,7 @@ See `gradle/libs.versions.toml` for current versions.
 The project follows a layered architecture with clear separation of concerns:
 
 ```
-net.dinkla.nkp
+net.dinkla.arclens
 ├── commands/          # CLI command implementations
 ├── domain/            # Domain models
 │   ├── kotlinlang/   # Kotlin language constructs (Project, Package, Class, etc.)
@@ -66,7 +66,7 @@ net.dinkla.nkp
 ### Key Conventions
 
 - **Domain Models**: Use `@Serializable` data classes for JSON serialization
-- **Commands**: Extend `AbstractCommand` from `net.dinkla.nkp.commands`
+- **Commands**: Extend `AbstractCommand` from `net.dinkla.arclens.commands`
 - **Internal APIs**: Use `internal` visibility for implementation details
 - **Test Structure**: Use Kotest's `StringSpec` style with Given/When/Then comments
 
@@ -103,7 +103,7 @@ The project has strict code quality requirements enforced by **detekt**:
 - **Functions**: camelCase (e.g., `extractIdentifier`, `loadProject`)
 - **Properties**: camelCase (e.g., `packageName`, `filePath`)
 - **Constants**: UPPER_SNAKE_CASE for top-level, camelCase for object properties
-- **Packages**: lowercase, dot-separated (e.g., `net.dinkla.nkp.domain`)
+- **Packages**: lowercase, dot-separated (e.g., `net.dinkla.arclens.domain`)
 
 ### File Organization
 
@@ -141,7 +141,7 @@ class ExtractTest : StringSpec({
 2. **Given/When/Then**: Structure tests with comments
 3. **Test Coverage**: Aim for high coverage (reports in `build/reports/jacoco/test/html/index.html`)
 4. **Architecture Tests**: Use ArchUnit for architectural constraints
-5. **Fixtures**: Reuse test fixtures from `src/test/kotlin/net/dinkla/nkp/Fixture.kt`
+5. **Fixtures**: Reuse test fixtures from `src/test/kotlin/net/dinkla/arclens/Fixture.kt`
 
 ### Running Tests
 

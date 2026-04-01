@@ -65,7 +65,7 @@ Replaced kotlin-grammar-tools with PSI-based parser using `kotlin-compiler-embed
 ## Other Ideas
 
 - **Better error recovery** - Partial parse results instead of skipping entire file
-- **Configuration file support** - `.nkp.yml` or `nkp.config.json` for project-specific rules
+- **Configuration file support** - `.arclens.yml` or `arclens.config.json` for project-specific rules
 - **Watch mode** - Monitor source directories for changes, incrementally update model
 - **Comparison/diff mode** - Compare two model.json files, show changes for PR reviews
 

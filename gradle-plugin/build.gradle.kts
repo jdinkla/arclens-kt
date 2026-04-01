@@ -22,10 +22,10 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        create("nkp") {
-            id = "net.dinkla.nkp"
-            implementationClass = "net.dinkla.nkp.gradle.NkpPlugin"
-            displayName = "Kotlin NKP Analysis Plugin"
+        create("arclens") {
+            id = "net.dinkla.arclens"
+            implementationClass = "net.dinkla.arclens.gradle.ArclensPlugin"
+            displayName = "Arclens Kotlin Analysis Plugin"
             description = "Static analysis for Kotlin programs - package dependencies, class hierarchies, and metrics"
         }
     }

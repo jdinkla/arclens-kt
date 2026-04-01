@@ -52,5 +52,5 @@ tasks.jacocoTestReport {
 }
 
 application {
-    mainClass.set("net.dinkla.nkp.NkpKt")
+    mainClass.set("net.dinkla.arclens.ArclensKt")
 }
