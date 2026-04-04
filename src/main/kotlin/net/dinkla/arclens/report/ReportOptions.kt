@@ -10,10 +10,12 @@ data class ReportOptions(
     val largeClassThreshold: Int = DEFAULT_LARGE_CLASS_THRESHOLD,
     val longMethodThreshold: Int = DEFAULT_LONG_METHOD_THRESHOLD,
     val deepInheritanceThreshold: Int = DEFAULT_DEEP_INHERITANCE_THRESHOLD,
+    val complexMethodThreshold: Int = DEFAULT_COMPLEX_METHOD_THRESHOLD,
 ) {
     companion object {
         const val DEFAULT_LARGE_CLASS_THRESHOLD = 10
         const val DEFAULT_LONG_METHOD_THRESHOLD = 60
         const val DEFAULT_DEEP_INHERITANCE_THRESHOLD = 3
+        const val DEFAULT_COMPLEX_METHOD_THRESHOLD = 15
     }
 }

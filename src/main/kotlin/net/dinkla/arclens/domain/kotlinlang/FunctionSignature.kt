@@ -12,4 +12,5 @@ data class FunctionSignature(
     val memberModifier: MemberModifier? = null,
     val functionModifiers: List<FunctionModifier> = listOf(),
     val lineCount: Int = 0,
+    val cyclomaticComplexity: Int = 0,
 ) : Declaration

@@ -2,6 +2,7 @@ package net.dinkla.arclens.gradle.tasks
 
 import kotlinx.serialization.json.Json
 import net.dinkla.arclens.analysis.ClassStatistics
+import net.dinkla.arclens.analysis.ComplexMethodReport
 import net.dinkla.arclens.analysis.DeclarationFilter
 import net.dinkla.arclens.analysis.DeepInheritanceReport
 import net.dinkla.arclens.analysis.FileStatistics
@@ -151,6 +152,11 @@ abstract class ArclensAnalyzeTask : DefaultTask() {
         if (reports.deepInheritance.get()) {
             val threshold = reports.deepInheritanceThreshold.get()
             writeReport(output, "deep-inheritance.json", DeepInheritanceReport.from(project, threshold))
+            count++
+        }
+        if (reports.complexMethods.get()) {
+            val threshold = reports.complexMethodThreshold.get()
+            writeReport(output, "complex-methods.json", ComplexMethodReport.from(project, threshold))
             count++
         }
         return count

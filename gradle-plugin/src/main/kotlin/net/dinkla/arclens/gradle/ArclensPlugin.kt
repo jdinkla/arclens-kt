@@ -63,6 +63,8 @@ class ArclensPlugin : Plugin<Project> {
             reports.longMethodThreshold.set(extension.reports.longMethodThreshold)
             reports.deepInheritance.set(extension.reports.deepInheritance)
             reports.deepInheritanceThreshold.set(extension.reports.deepInheritanceThreshold)
+            reports.complexMethods.set(extension.reports.complexMethods)
+            reports.complexMethodThreshold.set(extension.reports.complexMethodThreshold)
         }
 
         // Register aggregate task
@@ -90,6 +92,8 @@ class ArclensPlugin : Plugin<Project> {
         reports.longMethodThreshold.convention(DEFAULT_LONG_METHOD_THRESHOLD)
         reports.deepInheritance.convention(true)
         reports.deepInheritanceThreshold.convention(DEFAULT_DEEP_INHERITANCE_THRESHOLD)
+        reports.complexMethods.convention(true)
+        reports.complexMethodThreshold.convention(DEFAULT_COMPLEX_METHOD_THRESHOLD)
     }
 
     companion object {
@@ -97,5 +101,6 @@ class ArclensPlugin : Plugin<Project> {
         const val DEFAULT_LARGE_CLASS_THRESHOLD = 10
         const val DEFAULT_LONG_METHOD_THRESHOLD = 60
         const val DEFAULT_DEEP_INHERITANCE_THRESHOLD = 3
+        const val DEFAULT_COMPLEX_METHOD_THRESHOLD = 15
     }
 }

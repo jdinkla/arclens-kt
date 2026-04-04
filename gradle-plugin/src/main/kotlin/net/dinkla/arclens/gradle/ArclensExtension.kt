@@ -124,4 +124,12 @@ abstract class ArclensReportExtension {
     /** Inheritance depth threshold for deep inheritance detection. */
     @get:Input
     abstract val deepInheritanceThreshold: Property<Int>
+
+    /** Detect functions with high cyclomatic complexity. */
+    @get:Input
+    abstract val complexMethods: Property<Boolean>
+
+    /** Cyclomatic complexity threshold for complex method detection. */
+    @get:Input
+    abstract val complexMethodThreshold: Property<Int>
 }

@@ -21,11 +21,17 @@ import net.dinkla.arclens.domain.kotlinlang.PropertyModifier
 import net.dinkla.arclens.domain.kotlinlang.Type
 import net.dinkla.arclens.domain.kotlinlang.TypeAlias
 import net.dinkla.arclens.domain.kotlinlang.VisibilityModifier
+import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.lexer.KtTokens
+import org.jetbrains.kotlin.psi.KtBinaryExpression
+import org.jetbrains.kotlin.psi.KtCatchClause
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtClassOrObject
+import org.jetbrains.kotlin.psi.KtDoWhileExpression
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtForExpression
 import org.jetbrains.kotlin.psi.KtFunctionType
+import org.jetbrains.kotlin.psi.KtIfExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtNullableType
 import org.jetbrains.kotlin.psi.KtObjectDeclaration
@@ -35,6 +41,8 @@ import org.jetbrains.kotlin.psi.KtSecondaryConstructor
 import org.jetbrains.kotlin.psi.KtTypeAlias
 import org.jetbrains.kotlin.psi.KtTypeReference
 import org.jetbrains.kotlin.psi.KtUserType
+import org.jetbrains.kotlin.psi.KtWhenEntry
+import org.jetbrains.kotlin.psi.KtWhileExpression
 
 /**
  * Extract a KotlinFile domain model from a PSI KtFile.
@@ -193,6 +201,7 @@ private fun extractFunction(function: KtNamedFunction): FunctionSignature {
     val memberModifier = extractMemberModifier(function)
     val functionModifiers = extractFunctionModifiers(function)
     val lineCount = function.text.lines().size
+    val complexity = calculateCyclomaticComplexity(function)
 
     return FunctionSignature(
         name = name,
@@ -203,6 +212,7 @@ private fun extractFunction(function: KtNamedFunction): FunctionSignature {
         memberModifier = memberModifier,
         functionModifiers = functionModifiers,
         lineCount = lineCount,
+        cyclomaticComplexity = complexity,
     )
 }
 
@@ -313,6 +323,39 @@ private fun extractFunctionTypeName(functionType: KtFunctionType): String {
         }
     val returnType = functionType.returnTypeReference?.let { extractType(it).name } ?: "Unit"
     return "(${params.joinToString(",")}) -> $returnType"
+}
+
+// ==================== Cyclomatic Complexity ====================
+
+/**
+ * Calculate cyclomatic complexity for a function.
+ * Starts at 1 (base path) and increments for each decision point:
+ * if, when entry (non-else), for, while, do-while, catch, &&, ||
+ */
+internal fun calculateCyclomaticComplexity(function: KtNamedFunction): Int {
+    val body = function.bodyExpression ?: function.bodyBlockExpression ?: return 1
+    return 1 + countDecisionPoints(body)
+}
+
+private fun countDecisionPoints(element: PsiElement): Int {
+    var count =
+        when (element) {
+            is KtIfExpression -> 1
+            is KtWhenEntry -> if (!element.isElse) 1 else 0
+            is KtForExpression -> 1
+            is KtWhileExpression -> 1
+            is KtDoWhileExpression -> 1
+            is KtCatchClause -> 1
+            is KtBinaryExpression -> {
+                val op = element.operationToken
+                if (op == KtTokens.ANDAND || op == KtTokens.OROR) 1 else 0
+            }
+            else -> 0
+        }
+    for (child in element.children) {
+        count += countDecisionPoints(child)
+    }
+    return count
 }
 
 // ==================== Modifier Extraction ====================

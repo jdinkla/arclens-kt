@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.options.versionOption
 import net.dinkla.arclens.commands.CircularDependenciesCommand
 import net.dinkla.arclens.commands.ClassStatisticsCommand
+import net.dinkla.arclens.commands.ComplexMethodCommand
 import net.dinkla.arclens.commands.DeepInheritanceCommand
 import net.dinkla.arclens.commands.FileStatisticsCommand
 import net.dinkla.arclens.commands.HtmlReportCommand
@@ -34,6 +35,7 @@ fun main(args: Array<String>) {
             Parse(),
             CircularDependenciesCommand(),
             ClassStatisticsCommand(),
+            ComplexMethodCommand(),
             DeepInheritanceCommand(),
             FileStatisticsCommand(),
             HtmlReportCommand(),

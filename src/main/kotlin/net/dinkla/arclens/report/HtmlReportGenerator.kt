@@ -279,6 +279,13 @@ class HtmlReportGenerator(
             di.deeplyInheritedClasses,
             listOf("Class" to "string", "Package" to "string", "Depth" to "number"),
         ) { cls -> listOf(cls.className, cls.packageName.name, cls.inheritanceDepth.toString()) }
+
+        val cm = data.complexMethods
+        appendSmellTable(
+            "Complex Methods (threshold: ${cm.threshold} complexity)",
+            cm.complexMethods,
+            listOf("Function" to "string", "Class" to "string", "File" to "string", "Complexity" to "number"),
+        ) { m -> listOf(m.functionName, m.className ?: "-", m.filePath.path, m.cyclomaticComplexity.toString()) }
         appendLine("</section>")
     }
 

@@ -447,4 +447,142 @@ class PsiExtractTest :
             outer.classes[1].elementType shouldBe ClassSignature.Type.OBJECT
             outer.classes[1].functions shouldHaveSize 1
         }
+
+        // ==================== Cyclomatic complexity ====================
+
+        "should calculate complexity 1 for empty function body" {
+            // Given
+            val source = "fun f() {}"
+            // When
+            val function = parseDeclarations(source).first() as FunctionSignature
+            // Then
+            function.cyclomaticComplexity shouldBe 1
+        }
+
+        "should calculate complexity 1 for expression-body function" {
+            // Given
+            val source = "fun f(x: Int): Int = x + 1"
+            // When
+            val function = parseDeclarations(source).first() as FunctionSignature
+            // Then
+            function.cyclomaticComplexity shouldBe 1
+        }
+
+        "should count if expression" {
+            // Given
+            val source =
+                """
+                fun f(x: Int): String {
+                    if (x > 0) return "positive"
+                    return "non-positive"
+                }
+                """.trimIndent()
+            // When
+            val function = parseDeclarations(source).first() as FunctionSignature
+            // Then
+            function.cyclomaticComplexity shouldBe 2
+        }
+
+        "should count when entries excluding else" {
+            // Given
+            val source =
+                """
+                fun f(x: Int): String {
+                    return when (x) {
+                        1 -> "one"
+                        2 -> "two"
+                        3 -> "three"
+                        else -> "other"
+                    }
+                }
+                """.trimIndent()
+            // When
+            val function = parseDeclarations(source).first() as FunctionSignature
+            // Then
+            function.cyclomaticComplexity shouldBe 4
+        }
+
+        "should count for loop" {
+            // Given
+            val source =
+                """
+                fun f(items: List<Int>): Int {
+                    var sum = 0
+                    for (item in items) {
+                        sum += item
+                    }
+                    return sum
+                }
+                """.trimIndent()
+            // When
+            val function = parseDeclarations(source).first() as FunctionSignature
+            // Then
+            function.cyclomaticComplexity shouldBe 2
+        }
+
+        "should count while and do-while" {
+            // Given
+            val source =
+                """
+                fun f(n: Int): Int {
+                    var i = 0
+                    while (i < n) { i++ }
+                    do { i-- } while (i > 0)
+                    return i
+                }
+                """.trimIndent()
+            // When
+            val function = parseDeclarations(source).first() as FunctionSignature
+            // Then
+            function.cyclomaticComplexity shouldBe 3
+        }
+
+        "should count catch clause" {
+            // Given
+            val source =
+                """
+                fun f(): Int {
+                    return try {
+                        42
+                    } catch (e: Exception) {
+                        0
+                    }
+                }
+                """.trimIndent()
+            // When
+            val function = parseDeclarations(source).first() as FunctionSignature
+            // Then
+            function.cyclomaticComplexity shouldBe 2
+        }
+
+        "should count logical operators" {
+            // Given
+            val source =
+                """
+                fun f(a: Boolean, b: Boolean, c: Boolean): Boolean {
+                    return a && b || c
+                }
+                """.trimIndent()
+            // When
+            val function = parseDeclarations(source).first() as FunctionSignature
+            // Then
+            function.cyclomaticComplexity shouldBe 3
+        }
+
+        "should count nested if expressions" {
+            // Given
+            val source =
+                """
+                fun f(x: Int, y: Int): String {
+                    if (x > 0) {
+                        if (y > 0) return "both positive"
+                    }
+                    return "other"
+                }
+                """.trimIndent()
+            // When
+            val function = parseDeclarations(source).first() as FunctionSignature
+            // Then
+            function.cyclomaticComplexity shouldBe 3
+        }
     })

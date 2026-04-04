@@ -34,7 +34,7 @@ arclens-kt is a static analysis tool for Kotlin programs (formerly kotlin-nkp).
 | Class-level statistics | ✅ | |
 | File-level statistics | ✅ | |
 | Lines of code metrics | ✅ | |
-| Cyclomatic complexity | | ❌ |
+| Cyclomatic complexity | ✅ | |
 | Code duplication detection | | ❌ |
 | **Dependency Analysis** |
 | Package import relationships | ✅ | |
@@ -52,8 +52,9 @@ arclens-kt is a static analysis tool for Kotlin programs (formerly kotlin-nkp).
 | Large class detection | ✅ | |
 | Long method detection | ✅ | |
 | Deep inheritance detection | ✅ | |
+| Complex method detection | ✅ | |
 
-**Summary**: arclens excels at **architectural and structural analysis** (package coupling, dependencies, class hierarchies) and provides **code smell detection** (large classes, long methods, deep inheritance). Not yet supported: cyclomatic complexity, code duplication, and temporal analysis.
+**Summary**: arclens excels at **architectural and structural analysis** (package coupling, dependencies, class hierarchies) and provides **code smell detection** (large classes, long methods, deep inheritance, cyclomatic complexity). Not yet supported: code duplication and temporal analysis.
 
 ## Features
 
@@ -71,6 +72,7 @@ Commands:
   parse                     Parse a source directory and generate a model file.
   circular-dependencies     Detect circular dependencies between packages
   class-statistics          Class statistics
+  complex-methods           Detect functions with high cyclomatic complexity
   deep-inheritance          Detect classes with deep inheritance hierarchies
   file-statistics           File statistics and imports report
   large-classes             Detect classes with too many declarations
@@ -157,6 +159,8 @@ $ bin/arclens.sh long-methods generated/model.json > generated/long-methods.json
 $ bin/arclens.sh long-methods -t 30 generated/model.json > generated/long-methods.json
 $ bin/arclens.sh deep-inheritance generated/model.json > generated/deep-inheritance.json
 $ bin/arclens.sh deep-inheritance -t 2 generated/model.json > generated/deep-inheritance.json
+$ bin/arclens.sh complex-methods generated/model.json > generated/complex-methods.json
+$ bin/arclens.sh complex-methods -t 10 generated/model.json > generated/complex-methods.json
 ```
 
 List packages:
@@ -225,6 +229,8 @@ arclens {
         longMethodThreshold.set(60)     // Line count threshold
         deepInheritance.set(true)       // Detect deep inheritance
         deepInheritanceThreshold.set(3) // Inheritance depth threshold
+        complexMethods.set(true)        // Detect complex methods
+        complexMethodThreshold.set(15)  // Cyclomatic complexity threshold
     }
 }
 ```
@@ -304,6 +310,9 @@ $ ./gradlew refreshVersions
 
 ### `generated/deep-inheritance.json`
 - JSON object with deep inheritance detection results: `threshold` (the depth threshold used), `deeplyInheritedClasses` (array with `className`, `packageName`, `inheritanceDepth`), and `totalDeeplyInherited`.
+
+### `generated/complex-methods.json`
+- JSON object with complex method detection results: `threshold` (the cyclomatic complexity threshold used), `complexMethods` (array of flagged functions with `functionName`, `className` (null for top-level), `filePath`, `cyclomaticComplexity`), and `totalComplexMethods`.
 
 ### `generated/circular-dependencies.json`
 - JSON object containing circular dependency analysis results:

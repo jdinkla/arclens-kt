@@ -4,11 +4,10 @@
 
 | Feature | Priority | Effort | Notes |
 |---------|----------|--------|-------|
-| Cyclomatic complexity | Medium | Medium | Count branches per function; combined with lineCount enables distinguishing complex-short from simple-long methods |
 | Call graph / fan-in-fan-out | Medium | High | Cross-file method-level analysis: who calls what, method fan-in/fan-out; moves tool from class/package level to method level |
 | Code duplication detection | Low | High | Needs token/AST-based comparison |
 
-Done: LOC metrics, large class detection, long method detection, deep inheritance detection.
+Done: LOC metrics, large class detection, long method detection, deep inheritance detection, cyclomatic complexity.
 
 ## Domain Model
 

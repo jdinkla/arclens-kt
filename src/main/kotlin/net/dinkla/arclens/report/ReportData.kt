@@ -3,6 +3,7 @@ package net.dinkla.arclens.report
 import net.dinkla.arclens.analysis.AnalyzedPackage
 import net.dinkla.arclens.analysis.CircularDependenciesReport
 import net.dinkla.arclens.analysis.ClassStatistics
+import net.dinkla.arclens.analysis.ComplexMethodReport
 import net.dinkla.arclens.analysis.DeclarationFilter
 import net.dinkla.arclens.analysis.DeepInheritanceReport
 import net.dinkla.arclens.analysis.FileStatistics
@@ -37,6 +38,7 @@ data class ReportData(
     val largeClasses: LargeClassReport,
     val longMethods: LongMethodReport,
     val deepInheritance: DeepInheritanceReport,
+    val complexMethods: ComplexMethodReport,
 ) {
     val totalFiles: Int get() = project.files.size
     val totalPackages: Int get() = project.packages().size
@@ -50,7 +52,8 @@ data class ReportData(
         get() =
             largeClasses.totalLargeClasses +
                 longMethods.totalLongMethods +
-                deepInheritance.totalDeeplyInherited
+                deepInheritance.totalDeeplyInherited +
+                complexMethods.totalComplexMethods
 
     private fun calculateHealthScore(): HealthScore {
         val hasCircularDeps = circularDependencies.hasCycles
@@ -99,6 +102,7 @@ data class ReportData(
                 largeClasses = LargeClassReport.from(project, options.largeClassThreshold),
                 longMethods = LongMethodReport.from(project, options.longMethodThreshold),
                 deepInheritance = DeepInheritanceReport.from(project, options.deepInheritanceThreshold),
+                complexMethods = ComplexMethodReport.from(project, options.complexMethodThreshold),
             )
         }
     }
