@@ -165,7 +165,6 @@ just coverage-report
 
 ### Prerequisites
 
-- **Java 17+**: Required for building dependencies (kotlin-grammar-tools)
 - **JVM 21**: Project targets JVM 21
 - **Gradle**: Included via wrapper (`./gradlew`)
 - **Optional Tools**:
@@ -195,21 +194,6 @@ Or use Gradle directly:
 ./gradlew jacocoTestReport # Generate coverage report
 ./gradlew refreshVersions # Update dependency versions
 ```
-
-### Building Custom Dependencies
-
-The project requires custom libraries that must be built locally:
-
-1. **Kotlin Grammar Tools**: https://github.com/Kotlin/grammar-tools
-2. **Kotlin Spec**: https://github.com/Kotlin/kotlin-spec
-
-Run the installation script:
-
-```bash
-bin/install-libs.sh
-```
-
-**Note**: Requires Java 17 to build these dependencies.
 
 ## Code Review Checklist
 

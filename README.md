@@ -91,21 +91,6 @@ Commands:
 - [just](https://github.com/casey/just) (optional, for convenience commands)
 - [ktlint](https://github.com/pinterest/ktlint) (optional, for code formatting)
 
-### Build Dependencies
-
-This project uses custom libraries to parse Kotlin source code. You need to build these first:
-
-- https://github.com/Kotlin/grammar-tools
-- https://github.com/Kotlin/kotlin-spec
-
-Run the installation script:
-
-```sh
-$ bin/install-libs.sh
-```
-
-**Note:** The installation script requires Java 17. The project itself targets JVM 21.
-
 ### Optional Tools
 
 - [mermaid-cli](https://github.com/mermaid-js/mermaid-cli) - useful for converting Mermaid diagrams to SVG/HTML
@@ -194,8 +179,6 @@ plugins {
     id("net.dinkla.arclens") version "0.1"
 }
 ```
-
-**Note:** The plugin requires the kotlin-grammar-tools library to be available in mavenLocal. Run `bin/install-libs.sh` first.
 
 ### Configuration
 
