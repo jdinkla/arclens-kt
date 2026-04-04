@@ -100,4 +100,32 @@ abstract class ArclensReportExtension {
     /** Include private declarations in file statistics. */
     @get:Input
     abstract val includePrivateDeclarations: Property<Boolean>
+
+    /** Detect classes with too many declarations. */
+    @get:Input
+    abstract val largeClasses: Property<Boolean>
+
+    /** Declaration count threshold for large class detection. */
+    @get:Input
+    abstract val largeClassThreshold: Property<Int>
+
+    /** Detect functions with too many lines. */
+    @get:Input
+    abstract val longMethods: Property<Boolean>
+
+    /** Line count threshold for long method detection. */
+    @get:Input
+    abstract val longMethodThreshold: Property<Int>
+
+    /** Detect unused imports. */
+    @get:Input
+    abstract val unusedImports: Property<Boolean>
+
+    /** Detect classes with deep inheritance hierarchies. */
+    @get:Input
+    abstract val deepInheritance: Property<Boolean>
+
+    /** Inheritance depth threshold for deep inheritance detection. */
+    @get:Input
+    abstract val deepInheritanceThreshold: Property<Int>
 }

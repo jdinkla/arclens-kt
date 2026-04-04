@@ -3,9 +3,13 @@ package net.dinkla.arclens.gradle.tasks
 import kotlinx.serialization.json.Json
 import net.dinkla.arclens.analysis.ClassStatistics
 import net.dinkla.arclens.analysis.DeclarationFilter
+import net.dinkla.arclens.analysis.DeepInheritanceReport
 import net.dinkla.arclens.analysis.FileStatistics
+import net.dinkla.arclens.analysis.LargeClassReport
+import net.dinkla.arclens.analysis.LongMethodReport
 import net.dinkla.arclens.analysis.MermaidCouplingDiagram
 import net.dinkla.arclens.analysis.PackageImports
+import net.dinkla.arclens.analysis.UnusedImportsReport
 import net.dinkla.arclens.analysis.combinedReport
 import net.dinkla.arclens.analysis.mermaidClassDiagram
 import net.dinkla.arclens.analysis.mermaidImportsFlowDiagram
@@ -51,147 +55,119 @@ abstract class ArclensAnalyzeTask : DefaultTask() {
         var generatedCount = 0
 
         // JSON Reports
-        if (reports.classStatistics.get()) {
-            generateClassStatistics(project, output)
-            generatedCount++
-        }
+        generatedCount += generateJsonReports(project, output)
 
-        if (reports.fileStatistics.get()) {
-            generateFileStatistics(project, output, reports.includePrivateDeclarations.get())
-            generatedCount++
-        }
-
-        if (reports.packageStatistics.get()) {
-            generatePackageStatistics(project, output)
-            generatedCount++
-        }
-
-        if (reports.packageCoupling.get()) {
-            generatePackageCoupling(project, output, reports.includeAllLibraries.get())
-            generatedCount++
-        }
-
-        if (reports.packages.get()) {
-            generatePackages(project, output)
-            generatedCount++
-        }
+        // Code smell detection
+        generatedCount += generateCodeSmellReports(project, output)
 
         // Mermaid Diagrams
-        if (reports.mermaidClassDiagram.get()) {
-            generateMermaidClassDiagram(project, output)
-            generatedCount++
-        }
-
-        if (reports.mermaidImportDiagram.get()) {
-            generateMermaidImportDiagram(project, output, reports.includeAllLibraries.get())
-            generatedCount++
-        }
-
-        if (reports.mermaidCouplingDiagram.get()) {
-            generateMermaidCouplingDiagram(project, output, reports.includeAllLibraries.get())
-            generatedCount++
-        }
+        generatedCount += generateMermaidDiagrams(project, output)
 
         logger.lifecycle("Arclens: Generated $generatedCount reports in ${output.absolutePath}")
     }
 
-    private fun generateClassStatistics(
+    private fun generateJsonReports(
         project: Project,
         output: File,
-    ) {
-        val stats = ClassStatistics.from(project)
-        val file = File(output, "class-statistics.json")
-        file.writeText(json.encodeToString(stats))
-        logger.info("Arclens: Generated ${file.name}")
+    ): Int {
+        var count = 0
+        if (reports.classStatistics.get()) {
+            writeReport(output, "class-statistics.json", ClassStatistics.from(project))
+            count++
+        }
+        if (reports.fileStatistics.get()) {
+            val filter = DeclarationFilter.select(reports.includePrivateDeclarations.get())
+            writeReport(output, "file-statistics.json", FileStatistics.from(project, filter))
+            count++
+        }
+        if (reports.packageStatistics.get()) {
+            writeReport(output, "package-statistics.json", packagesStatistics(project))
+            count++
+        }
+        if (reports.packageCoupling.get()) {
+            val imports = selectImports(project, reports.includeAllLibraries.get())
+            writeReport(output, "package-coupling.json", combinedReport(imports))
+            count++
+        }
+        if (reports.packages.get()) {
+            writeReport(output, "packages.json", project.packages())
+            count++
+        }
+        return count
     }
 
-    private fun generateFileStatistics(
+    private fun selectImports(
         project: Project,
-        output: File,
-        includePrivate: Boolean,
-    ) {
-        val filter = DeclarationFilter.select(includePrivate)
-        val stats = FileStatistics.from(project, filter)
-        val file = File(output, "file-statistics.json")
-        file.writeText(json.encodeToString(stats))
-        logger.info("Arclens: Generated ${file.name}")
-    }
-
-    private fun generatePackageStatistics(
-        project: Project,
-        output: File,
-    ) {
-        val stats = packagesStatistics(project)
-        val file = File(output, "package-statistics.json")
-        file.writeText(json.encodeToString(stats))
-        logger.info("Arclens: Generated ${file.name}")
-    }
-
-    private fun generatePackageCoupling(
-        project: Project,
-        output: File,
         includeAll: Boolean,
+    ) = if (includeAll) PackageImports.allImports(project) else PackageImports.filteredImports(project)
+
+    private fun generateMermaidDiagrams(
+        project: Project,
+        output: File,
+    ): Int {
+        val includeAll = reports.includeAllLibraries.get()
+        var count = 0
+        if (reports.mermaidClassDiagram.get()) {
+            writeDiagram(output, "class-diagram.mermaid", mermaidClassDiagram(project))
+            count++
+        }
+        if (reports.mermaidImportDiagram.get()) {
+            val suffix = if (includeAll) "-all" else ""
+            writeDiagram(output, "import-diagram$suffix.mermaid", mermaidImportsFlowDiagram(project, !includeAll))
+            count++
+        }
+        if (reports.mermaidCouplingDiagram.get()) {
+            val imports = selectImports(project, includeAll)
+            val diagram = MermaidCouplingDiagram(combinedReport(imports)).generate()
+            val suffix = if (includeAll) "-all" else ""
+            writeDiagram(output, "coupling-diagram$suffix.mermaid", diagram)
+            count++
+        }
+        return count
+    }
+
+    private fun writeDiagram(
+        output: File,
+        fileName: String,
+        content: String,
     ) {
-        val imports =
-            if (includeAll) {
-                PackageImports.allImports(project)
-            } else {
-                PackageImports.filteredImports(project)
-            }
-        val report = combinedReport(imports)
-        val file = File(output, "package-coupling.json")
+        val file = File(output, fileName)
+        file.writeText(content)
+        logger.info("Arclens: Generated ${file.name}")
+    }
+
+    private fun generateCodeSmellReports(
+        project: Project,
+        output: File,
+    ): Int {
+        var count = 0
+        if (reports.largeClasses.get()) {
+            writeReport(output, "large-classes.json", LargeClassReport.from(project, reports.largeClassThreshold.get()))
+            count++
+        }
+        if (reports.longMethods.get()) {
+            writeReport(output, "long-methods.json", LongMethodReport.from(project, reports.longMethodThreshold.get()))
+            count++
+        }
+        if (reports.unusedImports.get()) {
+            writeReport(output, "unused-imports.json", UnusedImportsReport.from(project))
+            count++
+        }
+        if (reports.deepInheritance.get()) {
+            val threshold = reports.deepInheritanceThreshold.get()
+            writeReport(output, "deep-inheritance.json", DeepInheritanceReport.from(project, threshold))
+            count++
+        }
+        return count
+    }
+
+    private inline fun <reified T> writeReport(
+        output: File,
+        fileName: String,
+        report: T,
+    ) {
+        val file = File(output, fileName)
         file.writeText(json.encodeToString(report))
-        logger.info("Arclens: Generated ${file.name}")
-    }
-
-    private fun generatePackages(
-        project: Project,
-        output: File,
-    ) {
-        val packages = project.packages()
-        val file = File(output, "packages.json")
-        file.writeText(json.encodeToString(packages))
-        logger.info("Arclens: Generated ${file.name}")
-    }
-
-    private fun generateMermaidClassDiagram(
-        project: Project,
-        output: File,
-    ) {
-        val diagram = mermaidClassDiagram(project)
-        val file = File(output, "class-diagram.mermaid")
-        file.writeText(diagram)
-        logger.info("Arclens: Generated ${file.name}")
-    }
-
-    private fun generateMermaidImportDiagram(
-        project: Project,
-        output: File,
-        includeAll: Boolean,
-    ) {
-        val diagram = mermaidImportsFlowDiagram(project, !includeAll)
-        val fileName = if (includeAll) "import-diagram-all.mermaid" else "import-diagram.mermaid"
-        val file = File(output, fileName)
-        file.writeText(diagram)
-        logger.info("Arclens: Generated ${file.name}")
-    }
-
-    private fun generateMermaidCouplingDiagram(
-        project: Project,
-        output: File,
-        includeAll: Boolean,
-    ) {
-        val imports =
-            if (includeAll) {
-                PackageImports.allImports(project)
-            } else {
-                PackageImports.filteredImports(project)
-            }
-        val report = combinedReport(imports)
-        val diagram = MermaidCouplingDiagram(report).generate()
-        val fileName = if (includeAll) "coupling-diagram-all.mermaid" else "coupling-diagram.mermaid"
-        val file = File(output, fileName)
-        file.writeText(diagram)
         logger.info("Arclens: Generated ${file.name}")
     }
 }

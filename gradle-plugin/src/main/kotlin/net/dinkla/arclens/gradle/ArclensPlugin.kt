@@ -57,6 +57,13 @@ class ArclensPlugin : Plugin<Project> {
             reports.mermaidCouplingDiagram.set(extension.reports.mermaidCouplingDiagram)
             reports.includeAllLibraries.set(extension.reports.includeAllLibraries)
             reports.includePrivateDeclarations.set(extension.reports.includePrivateDeclarations)
+            reports.largeClasses.set(extension.reports.largeClasses)
+            reports.largeClassThreshold.set(extension.reports.largeClassThreshold)
+            reports.longMethods.set(extension.reports.longMethods)
+            reports.longMethodThreshold.set(extension.reports.longMethodThreshold)
+            reports.unusedImports.set(extension.reports.unusedImports)
+            reports.deepInheritance.set(extension.reports.deepInheritance)
+            reports.deepInheritanceThreshold.set(extension.reports.deepInheritanceThreshold)
         }
 
         // Register aggregate task
@@ -78,9 +85,19 @@ class ArclensPlugin : Plugin<Project> {
         reports.mermaidCouplingDiagram.convention(true)
         reports.includeAllLibraries.convention(false)
         reports.includePrivateDeclarations.convention(false)
+        reports.largeClasses.convention(true)
+        reports.largeClassThreshold.convention(DEFAULT_LARGE_CLASS_THRESHOLD)
+        reports.longMethods.convention(true)
+        reports.longMethodThreshold.convention(DEFAULT_LONG_METHOD_THRESHOLD)
+        reports.unusedImports.convention(true)
+        reports.deepInheritance.convention(true)
+        reports.deepInheritanceThreshold.convention(DEFAULT_DEEP_INHERITANCE_THRESHOLD)
     }
 
     companion object {
         const val TASK_GROUP = "arclens analysis"
+        const val DEFAULT_LARGE_CLASS_THRESHOLD = 10
+        const val DEFAULT_LONG_METHOD_THRESHOLD = 60
+        const val DEFAULT_DEEP_INHERITANCE_THRESHOLD = 3
     }
 }
