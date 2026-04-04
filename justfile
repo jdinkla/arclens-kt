@@ -60,7 +60,6 @@ all-tasks REPOSITORY:
 
     just run large-classes {{model_file}} > {{generated}}/{{prefix}}large-classes.json
     just run long-methods {{model_file}} > {{generated}}/{{prefix}}long-methods.json
-    just run unused-imports {{model_file}} > {{generated}}/{{prefix}}unused-imports.json
     just run deep-inheritance {{model_file}} > {{generated}}/{{prefix}}deep-inheritance.json
 
     just run search {{model_file}} Declaration > {{generated}}/{{prefix}}search.json

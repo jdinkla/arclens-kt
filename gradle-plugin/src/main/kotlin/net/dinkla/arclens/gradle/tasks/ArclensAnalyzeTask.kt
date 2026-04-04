@@ -9,7 +9,6 @@ import net.dinkla.arclens.analysis.LargeClassReport
 import net.dinkla.arclens.analysis.LongMethodReport
 import net.dinkla.arclens.analysis.MermaidCouplingDiagram
 import net.dinkla.arclens.analysis.PackageImports
-import net.dinkla.arclens.analysis.UnusedImportsReport
 import net.dinkla.arclens.analysis.combinedReport
 import net.dinkla.arclens.analysis.mermaidClassDiagram
 import net.dinkla.arclens.analysis.mermaidImportsFlowDiagram
@@ -147,10 +146,6 @@ abstract class ArclensAnalyzeTask : DefaultTask() {
         }
         if (reports.longMethods.get()) {
             writeReport(output, "long-methods.json", LongMethodReport.from(project, reports.longMethodThreshold.get()))
-            count++
-        }
-        if (reports.unusedImports.get()) {
-            writeReport(output, "unused-imports.json", UnusedImportsReport.from(project))
             count++
         }
         if (reports.deepInheritance.get()) {

@@ -61,7 +61,6 @@ class ArclensPlugin : Plugin<Project> {
             reports.largeClassThreshold.set(extension.reports.largeClassThreshold)
             reports.longMethods.set(extension.reports.longMethods)
             reports.longMethodThreshold.set(extension.reports.longMethodThreshold)
-            reports.unusedImports.set(extension.reports.unusedImports)
             reports.deepInheritance.set(extension.reports.deepInheritance)
             reports.deepInheritanceThreshold.set(extension.reports.deepInheritanceThreshold)
         }
@@ -89,7 +88,6 @@ class ArclensPlugin : Plugin<Project> {
         reports.largeClassThreshold.convention(DEFAULT_LARGE_CLASS_THRESHOLD)
         reports.longMethods.convention(true)
         reports.longMethodThreshold.convention(DEFAULT_LONG_METHOD_THRESHOLD)
-        reports.unusedImports.convention(true)
         reports.deepInheritance.convention(true)
         reports.deepInheritanceThreshold.convention(DEFAULT_DEEP_INHERITANCE_THRESHOLD)
     }

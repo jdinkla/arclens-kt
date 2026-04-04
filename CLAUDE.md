@@ -69,7 +69,7 @@ net.dinkla.arclens
 - **Commands**: Extend `AbstractCommand` which provides `loadProject()` for model loading
 - **Domain Models**: All are `@Serializable` data classes for JSON export
 - **Analysis Functions**: Top-level functions that transform domain objects
-- **Detection Reports**: `LargeClassReport`, `LongMethodReport`, `UnusedImportsReport`, `DeepInheritanceReport` — threshold-based code smell detection with `companion object { fun from() }` factories
+- **Detection Reports**: `LargeClassReport`, `LongMethodReport`, `DeepInheritanceReport` — threshold-based code smell detection with `companion object { fun from() }` factories
 
 ## Adding a New Analysis Feature
 

@@ -19,7 +19,6 @@ import net.dinkla.arclens.commands.PackageStatisticsCommand
 import net.dinkla.arclens.commands.PackagesCommand
 import net.dinkla.arclens.commands.Parse
 import net.dinkla.arclens.commands.SearchCommand
-import net.dinkla.arclens.commands.UnusedImportsCommand
 
 class Arclens : CliktCommand(name = "arclens") {
     init {
@@ -47,6 +46,5 @@ fun main(args: Array<String>) {
             PackageStatisticsCommand(),
             PackagesCommand(),
             SearchCommand(),
-            UnusedImportsCommand(),
         ).main(args)
 }

@@ -7,7 +7,7 @@
 | Cyclomatic complexity | Medium | Medium | Count branches per function |
 | Code duplication detection | Low | High | Needs token/AST-based comparison |
 
-Done: LOC metrics, unused import detection, large class detection, long method detection, deep inheritance detection.
+Done: LOC metrics, large class detection, long method detection, deep inheritance detection.
 
 ## Parser Coverage
 

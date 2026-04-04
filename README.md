@@ -40,7 +40,6 @@ arclens-kt is a static analysis tool for Kotlin programs (formerly kotlin-nkp).
 | Package import relationships | ✅ | |
 | Class inheritance trees | ✅ | |
 | Circular dependency detection | ✅ | |
-| Unused import detection | ✅ | |
 | Dependency distance metrics | | ❌ |
 | **Visualization** |
 | Mermaid class diagrams | ✅ | |
@@ -54,7 +53,7 @@ arclens-kt is a static analysis tool for Kotlin programs (formerly kotlin-nkp).
 | Long method detection | ✅ | |
 | Deep inheritance detection | ✅ | |
 
-**Summary**: arclens excels at **architectural and structural analysis** (package coupling, dependencies, class hierarchies) and provides **code smell detection** (large classes, long methods, deep inheritance, unused imports). Not yet supported: cyclomatic complexity, code duplication, and temporal analysis.
+**Summary**: arclens excels at **architectural and structural analysis** (package coupling, dependencies, class hierarchies) and provides **code smell detection** (large classes, long methods, deep inheritance). Not yet supported: cyclomatic complexity, code duplication, and temporal analysis.
 
 ## Features
 
@@ -83,7 +82,6 @@ Commands:
   package-statistics        Package statistics
   packages                  Packages report
   search                    Search for a class by name
-  unused-imports            Detect unused imports
 ```
 
 ## Installation
@@ -157,7 +155,6 @@ $ bin/arclens.sh large-classes generated/model.json > generated/large-classes.js
 $ bin/arclens.sh large-classes -t 5 generated/model.json > generated/large-classes.json
 $ bin/arclens.sh long-methods generated/model.json > generated/long-methods.json
 $ bin/arclens.sh long-methods -t 30 generated/model.json > generated/long-methods.json
-$ bin/arclens.sh unused-imports generated/model.json > generated/unused-imports.json
 $ bin/arclens.sh deep-inheritance generated/model.json > generated/deep-inheritance.json
 $ bin/arclens.sh deep-inheritance -t 2 generated/model.json > generated/deep-inheritance.json
 ```
@@ -226,7 +223,6 @@ arclens {
         largeClassThreshold.set(10)     // Declaration count threshold
         longMethods.set(true)           // Detect long methods
         longMethodThreshold.set(60)     // Line count threshold
-        unusedImports.set(true)         // Detect unused imports
         deepInheritance.set(true)       // Detect deep inheritance
         deepInheritanceThreshold.set(3) // Inheritance depth threshold
     }
@@ -305,9 +301,6 @@ $ ./gradlew refreshVersions
 
 ### `generated/long-methods.json`
 - JSON object with long method detection results: `threshold` (the line count threshold used), `longMethods` (array of flagged functions with `functionName`, `className` (null for top-level), `filePath`, `lineCount`), and `totalLongMethods`.
-
-### `generated/unused-imports.json`
-- JSON object with unused import detection results: `unusedImports` (array with `filePath` and `importName` for each unused import) and `totalUnusedImports`. Uses heuristic name matching against declarations and type references.
 
 ### `generated/deep-inheritance.json`
 - JSON object with deep inheritance detection results: `threshold` (the depth threshold used), `deeplyInheritedClasses` (array with `className`, `packageName`, `inheritanceDepth`), and `totalDeeplyInherited`.

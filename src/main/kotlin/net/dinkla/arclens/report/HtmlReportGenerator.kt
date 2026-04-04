@@ -273,13 +273,6 @@ class HtmlReportGenerator(
             listOf("Function" to "string", "Class" to "string", "File" to "string", "Lines" to "number"),
         ) { m -> listOf(m.functionName, m.className ?: "-", m.filePath.path, m.lineCount.toString()) }
 
-        val ui = data.unusedImports
-        appendSmellTable(
-            "Unused Imports",
-            ui.unusedImports,
-            listOf("File" to "string", "Import" to "string"),
-        ) { imp -> listOf(imp.filePath.path, imp.importName) }
-
         val di = data.deepInheritance
         appendSmellTable(
             "Deep Inheritance (threshold: ${di.threshold} levels)",

@@ -117,10 +117,6 @@ abstract class ArclensReportExtension {
     @get:Input
     abstract val longMethodThreshold: Property<Int>
 
-    /** Detect unused imports. */
-    @get:Input
-    abstract val unusedImports: Property<Boolean>
-
     /** Detect classes with deep inheritance hierarchies. */
     @get:Input
     abstract val deepInheritance: Property<Boolean>

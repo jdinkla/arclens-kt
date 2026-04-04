@@ -12,7 +12,6 @@ import net.dinkla.arclens.analysis.LongMethodReport
 import net.dinkla.arclens.analysis.MermaidCouplingDiagram
 import net.dinkla.arclens.analysis.PackageCouplingItem
 import net.dinkla.arclens.analysis.PackageImports
-import net.dinkla.arclens.analysis.UnusedImportsReport
 import net.dinkla.arclens.analysis.combinedReport
 import net.dinkla.arclens.analysis.findCircularDependencies
 import net.dinkla.arclens.analysis.mermaidClassDiagram
@@ -37,7 +36,6 @@ data class ReportData(
     val mermaidCouplingDiagram: String,
     val largeClasses: LargeClassReport,
     val longMethods: LongMethodReport,
-    val unusedImports: UnusedImportsReport,
     val deepInheritance: DeepInheritanceReport,
 ) {
     val totalFiles: Int get() = project.files.size
@@ -52,7 +50,6 @@ data class ReportData(
         get() =
             largeClasses.totalLargeClasses +
                 longMethods.totalLongMethods +
-                unusedImports.totalUnusedImports +
                 deepInheritance.totalDeeplyInherited
 
     private fun calculateHealthScore(): HealthScore {
@@ -101,7 +98,6 @@ data class ReportData(
                 mermaidCouplingDiagram = MermaidCouplingDiagram(combinedReport(imports)).generate(),
                 largeClasses = LargeClassReport.from(project, options.largeClassThreshold),
                 longMethods = LongMethodReport.from(project, options.longMethodThreshold),
-                unusedImports = UnusedImportsReport.from(project),
                 deepInheritance = DeepInheritanceReport.from(project, options.deepInheritanceThreshold),
             )
         }
