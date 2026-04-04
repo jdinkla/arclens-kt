@@ -1,29 +1,38 @@
 # arclens-kt Roadmap
 
-## Medium Priority
+## Analysis Features
 
-| Item | Description | Effort |
-|------|-------------|--------|
-| **HTML reports** | Standalone HTML with embedded Mermaid diagrams, navigation, filtering | Medium |
-| **Streaming JSON** | Write files to JSON as parsed, reduce memory | Medium |
-| **Chunked processing** | Process packages/files in batches | Medium |
-| **Lazy loading** | Don't deserialize entire model for subset queries | Medium |
+| Feature | Priority | Effort | Notes |
+|---------|----------|--------|-------|
+| LOC metrics | High | Low | Basic line counts per file/class/method |
+| Unused import detection | High | Low | Compare imports against usages in file |
+| Large class detection | High | Low | Threshold on declaration count or LOC |
+| Long method detection | High | Low | Threshold on method LOC |
+| Deep inheritance detection | Medium | Low | Partially done: hierarchy walking exists in `Project`, needs threshold-based flagging command |
+| Cyclomatic complexity | Medium | Medium | Count branches per function |
+| Code duplication detection | Low | High | Needs token/AST-based comparison |
 
-## Analysis Capabilities
+## Parser Coverage
 
-| Feature | Effort |
-|---------|--------|
-| Cyclomatic complexity | Medium |
-| LOC metrics | Low |
-| Code duplication detection | High |
-| Unused import detection | Low |
-| Large class detection | Low |
-| Long method detection | Low |
-| Deep inheritance detection | Low |
+| Construct | Priority | Effort | Notes |
+|-----------|----------|--------|-------|
+| `suspend` function types as parameters | Medium | Low | e.g. `suspend () -> Unit` |
+| Secondary constructors | Medium | Low | |
+| Context receivers | Low | Medium | Kotlin feature is deprecated in favor of context parameters |
 
-## Other Ideas
+## Performance
 
-- **Better error recovery** - Partial parse results instead of skipping entire file
-- **Configuration file support** - `.arclens.yml` or `arclens.config.json` for project-specific rules
-- **Watch mode** - Monitor source directories for changes, incrementally update model
-- **Comparison/diff mode** - Compare two model.json files, show changes for PR reviews
+| Feature | Priority | Effort | Notes |
+|---------|----------|--------|-------|
+| Streaming JSON | Low | Medium | Write parsed files to JSON incrementally, reduce memory |
+| Chunked processing | Low | Medium | Process packages/files in batches |
+| Lazy loading | Low | Medium | Don't deserialize entire model for subset queries |
+
+## Tooling & UX
+
+| Feature | Priority | Effort | Notes |
+|---------|----------|--------|-------|
+| Configuration file support | Medium | Medium | `.arclens.yml` for project-specific rules and thresholds |
+| Comparison/diff mode | Medium | Medium | Compare two model.json files, show changes for PR reviews |
+| Better error recovery | Low | Medium | Partially done: `Result<KotlinFile>` error collection exists, but whole file is skipped on failure — needs partial results |
+| Watch mode | Low | Medium | Monitor source dirs, incrementally update model |

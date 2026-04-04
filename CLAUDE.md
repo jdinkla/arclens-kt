@@ -64,12 +64,6 @@ net.dinkla.arclens
 **Types:**
 - Simple types, generics, nullable types
 - Function types as parameters/return types
-
-**Not yet supported:**
-- `suspend` function types as parameters (e.g., `suspend () -> Unit`)
-- Context receivers
-- Secondary constructors
-
 ### Key Patterns
 
 - **Commands**: Extend `AbstractCommand` which provides `loadProject()` for model loading
