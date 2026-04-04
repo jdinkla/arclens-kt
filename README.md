@@ -33,14 +33,14 @@ arclens-kt is a static analysis tool for Kotlin programs (formerly kotlin-nkp).
 | **Code Quality Metrics** |
 | Class-level statistics | ✅ | |
 | File-level statistics | ✅ | |
+| Lines of code metrics | ✅ | |
 | Cyclomatic complexity | | ❌ |
-| Lines of code metrics | | ❌ |
 | Code duplication detection | | ❌ |
 | **Dependency Analysis** |
 | Package import relationships | ✅ | |
 | Class inheritance trees | ✅ | |
 | Circular dependency detection | ✅ | |
-| Unused import detection | | ❌ |
+| Unused import detection | ✅ | |
 | Dependency distance metrics | | ❌ |
 | **Visualization** |
 | Mermaid class diagrams | ✅ | |
@@ -50,11 +50,11 @@ arclens-kt is a static analysis tool for Kotlin programs (formerly kotlin-nkp).
 | Change frequency analysis | | ❌ |
 | Historical metric trends | | ❌ |
 | **Code Smells** |
-| Large class detection | | ❌ |
-| Long method detection | | ❌ |
-| Deep inheritance detection | | ❌ |
+| Large class detection | ✅ | |
+| Long method detection | ✅ | |
+| Deep inheritance detection | ✅ | |
 
-**Summary**: arclens excels at **architectural and structural analysis** (package coupling, dependencies, class hierarchies) but does not provide **code quality metrics** (complexity, size, code smells) or **temporal analysis** (change history, trends).
+**Summary**: arclens excels at **architectural and structural analysis** (package coupling, dependencies, class hierarchies) and provides **code smell detection** (large classes, long methods, deep inheritance, unused imports). Not yet supported: cyclomatic complexity, code duplication, and temporal analysis.
 
 ## Features
 
@@ -72,7 +72,10 @@ Commands:
   parse                     Parse a source directory and generate a model file.
   circular-dependencies     Detect circular dependencies between packages
   class-statistics          Class statistics
+  deep-inheritance          Detect classes with deep inheritance hierarchies
   file-statistics           File statistics and imports report
+  large-classes             Detect classes with too many declarations
+  long-methods              Detect functions with too many lines
   mermaid-class-diagram     Mermaid class diagram
   mermaid-coupling-diagram  Generate a Mermaid coupling diagram from code analysis
   mermaid-import-diagram    Mermaid import diagram
@@ -80,13 +83,14 @@ Commands:
   package-statistics        Package statistics
   packages                  Packages report
   search                    Search for a class by name
+  unused-imports            Detect unused imports
 ```
 
 ## Installation
 
 ### Prerequisites
 
-- Java 17+ (for building dependencies)
+- Java 21+ (JVM 21 target runtime)
 - Gradle (included via wrapper)
 - [just](https://github.com/casey/just) (optional, for convenience commands)
 - [ktlint](https://github.com/pinterest/ktlint) (optional, for code formatting)
@@ -147,6 +151,17 @@ $ bin/arclens.sh circular-dependencies generated/model.json > generated/circular
 $ bin/arclens.sh circular-dependencies --include-all-libraries generated/model.json > generated/circular-dependencies-all.json
 ```
 
+Detect code smells:
+```sh
+$ bin/arclens.sh large-classes generated/model.json > generated/large-classes.json
+$ bin/arclens.sh large-classes -t 5 generated/model.json > generated/large-classes.json
+$ bin/arclens.sh long-methods generated/model.json > generated/long-methods.json
+$ bin/arclens.sh long-methods -t 30 generated/model.json > generated/long-methods.json
+$ bin/arclens.sh unused-imports generated/model.json > generated/unused-imports.json
+$ bin/arclens.sh deep-inheritance generated/model.json > generated/deep-inheritance.json
+$ bin/arclens.sh deep-inheritance -t 2 generated/model.json > generated/deep-inheritance.json
+```
+
 List packages:
 ```sh
 $ bin/arclens.sh packages generated/model.json > generated/packages.json
@@ -205,6 +220,15 @@ arclens {
         mermaidCouplingDiagram.set(true) // Mermaid coupling diagram
         includeAllLibraries.set(false)  // Include external libraries in diagrams
         includePrivateDeclarations.set(false) // Include private declarations
+
+        // Code smell detection
+        largeClasses.set(true)          // Detect large classes
+        largeClassThreshold.set(10)     // Declaration count threshold
+        longMethods.set(true)           // Detect long methods
+        longMethodThreshold.set(60)     // Line count threshold
+        unusedImports.set(true)         // Detect unused imports
+        deepInheritance.set(true)       // Detect deep inheritance
+        deepInheritanceThreshold.set(3) // Inheritance depth threshold
     }
 }
 ```
@@ -276,6 +300,18 @@ $ ./gradlew refreshVersions
 ### `generated/search.json`
 - JSON object that captures a search result: `classes` (matches), `superClasses`, and `subClasses`, each expressed as serialized class signatures with parameters, supertypes, and modifiers.
 
+### `generated/large-classes.json`
+- JSON object with large class detection results: `threshold` (the declaration count threshold used), `largeClasses` (array of flagged classes with `className`, `packageName`, `declarations` count), and `totalLargeClasses`.
+
+### `generated/long-methods.json`
+- JSON object with long method detection results: `threshold` (the line count threshold used), `longMethods` (array of flagged functions with `functionName`, `className` (null for top-level), `filePath`, `lineCount`), and `totalLongMethods`.
+
+### `generated/unused-imports.json`
+- JSON object with unused import detection results: `unusedImports` (array with `filePath` and `importName` for each unused import) and `totalUnusedImports`. Uses heuristic name matching against declarations and type references.
+
+### `generated/deep-inheritance.json`
+- JSON object with deep inheritance detection results: `threshold` (the depth threshold used), `deeplyInheritedClasses` (array with `className`, `packageName`, `inheritanceDepth`), and `totalDeeplyInherited`.
+
 ### `generated/circular-dependencies.json`
 - JSON object containing circular dependency analysis results:
   - `cycles`: Array of detected cycles, each containing a list of `packages` involved in the cycle
@@ -299,4 +335,4 @@ $ ./gradlew refreshVersions
 ### `generated/mermaid-coupling-all-diagram.mermaid`
 - Coupling diagram that also includes external/library packages, useful for seeing outbound dependencies beyond the codebase.
 
-(c) 2023 - 2025 Jörn Dinkla https://www.dinkla.net
+(c) 2023 - 2026 Jörn Dinkla https://www.dinkla.net
