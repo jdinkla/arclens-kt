@@ -6,8 +6,11 @@ import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.options.versionOption
 import net.dinkla.arclens.commands.CircularDependenciesCommand
 import net.dinkla.arclens.commands.ClassStatisticsCommand
+import net.dinkla.arclens.commands.DeepInheritanceCommand
 import net.dinkla.arclens.commands.FileStatisticsCommand
 import net.dinkla.arclens.commands.HtmlReportCommand
+import net.dinkla.arclens.commands.LargeClassCommand
+import net.dinkla.arclens.commands.LongMethodCommand
 import net.dinkla.arclens.commands.MermaidClassDiagram
 import net.dinkla.arclens.commands.MermaidCouplingDiagram
 import net.dinkla.arclens.commands.MermaidImportDiagram
@@ -16,6 +19,7 @@ import net.dinkla.arclens.commands.PackageStatisticsCommand
 import net.dinkla.arclens.commands.PackagesCommand
 import net.dinkla.arclens.commands.Parse
 import net.dinkla.arclens.commands.SearchCommand
+import net.dinkla.arclens.commands.UnusedImportsCommand
 
 class Arclens : CliktCommand(name = "arclens") {
     init {
@@ -31,8 +35,11 @@ fun main(args: Array<String>) {
             Parse(),
             CircularDependenciesCommand(),
             ClassStatisticsCommand(),
+            DeepInheritanceCommand(),
             FileStatisticsCommand(),
             HtmlReportCommand(),
+            LargeClassCommand(),
+            LongMethodCommand(),
             MermaidClassDiagram(),
             MermaidCouplingDiagram(),
             MermaidImportDiagram(),
@@ -40,5 +47,6 @@ fun main(args: Array<String>) {
             PackageStatisticsCommand(),
             PackagesCommand(),
             SearchCommand(),
+            UnusedImportsCommand(),
         ).main(args)
 }
