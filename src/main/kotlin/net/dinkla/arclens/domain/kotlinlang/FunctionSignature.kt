@@ -11,4 +11,5 @@ data class FunctionSignature(
     override val visibilityModifier: VisibilityModifier? = null,
     val memberModifier: MemberModifier? = null,
     val functionModifiers: List<FunctionModifier> = listOf(),
+    val lineCount: Int = 0,
 ) : Declaration

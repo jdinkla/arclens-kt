@@ -46,7 +46,8 @@ internal fun extractKotlinFile(
     val packageName = extractPackageName(ktFile)
     val imports = extractImports(ktFile)
     val declarations = extractDeclarations(ktFile)
-    return KotlinFile(filePath, packageName, imports, declarations, lastModified, fileSize)
+    val lineCount = ktFile.text.lines().size
+    return KotlinFile(filePath, packageName, imports, declarations, lastModified, fileSize, lineCount)
 }
 
 /**
@@ -174,6 +175,7 @@ private fun extractFunction(function: KtNamedFunction): FunctionSignature {
     val visibilityModifier = extractVisibilityModifier(function)
     val memberModifier = extractMemberModifier(function)
     val functionModifiers = extractFunctionModifiers(function)
+    val lineCount = function.text.lines().size
 
     return FunctionSignature(
         name = name,
@@ -183,6 +185,7 @@ private fun extractFunction(function: KtNamedFunction): FunctionSignature {
         visibilityModifier = visibilityModifier,
         memberModifier = memberModifier,
         functionModifiers = functionModifiers,
+        lineCount = lineCount,
     )
 }
 

@@ -44,6 +44,7 @@ data class FileMetrics(
     val functions: Int,
     val properties: Int,
     val aliases: Int,
+    val lineCount: Int = 0,
 ) {
     companion object {
         fun default() = FileMetrics(0, 0, 0, 0, 0, 0)
@@ -107,6 +108,7 @@ private fun fileStatistics(
                 functions = declarations.functions.size,
                 properties = declarations.properties.size,
                 aliases = declarations.typeAliases.size,
+                lineCount = file.lineCount,
             ),
         coupling = Coupling(declarations.size, imports.size),
     )

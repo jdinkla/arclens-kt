@@ -11,6 +11,7 @@ data class KotlinFile(
     override val declarations: List<Declaration> = listOf(),
     val lastModified: Long = 0L,
     val fileSize: Long = 0L,
+    val lineCount: Int = 0,
 ) : DeclarationContainer {
     val fullyQualifiedName: String
         get() {
