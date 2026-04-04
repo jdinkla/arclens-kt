@@ -56,6 +56,13 @@ all-tasks REPOSITORY:
     just run package-statistics {{model_file}} > {{generated}}/{{prefix}}package-statistics.json
     just run packages {{model_file}} > {{generated}}/{{prefix}}packages.json
 
+    just run circular-dependencies {{model_file}} > {{generated}}/{{prefix}}circular-dependencies.json
+
+    just run large-classes {{model_file}} > {{generated}}/{{prefix}}large-classes.json
+    just run long-methods {{model_file}} > {{generated}}/{{prefix}}long-methods.json
+    just run unused-imports {{model_file}} > {{generated}}/{{prefix}}unused-imports.json
+    just run deep-inheritance {{model_file}} > {{generated}}/{{prefix}}deep-inheritance.json
+
     just run search {{model_file}} Declaration > {{generated}}/{{prefix}}search.json
 
     just run mermaid-class-diagram {{model_file}} > {{generated}}/{{prefix}}mermaid-class-diagram.mermaid
