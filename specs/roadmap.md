@@ -4,13 +4,10 @@
 
 | Feature | Priority | Effort | Notes |
 |---------|----------|--------|-------|
-| LOC metrics | High | Low | Basic line counts per file/class/method |
-| Unused import detection | High | Low | Compare imports against usages in file |
-| Large class detection | High | Low | Threshold on declaration count or LOC |
-| Long method detection | High | Low | Threshold on method LOC |
-| Deep inheritance detection | Medium | Low | Partially done: hierarchy walking exists in `Project`, needs threshold-based flagging command |
 | Cyclomatic complexity | Medium | Medium | Count branches per function |
 | Code duplication detection | Low | High | Needs token/AST-based comparison |
+
+Done: LOC metrics, unused import detection, large class detection, long method detection, deep inheritance detection.
 
 ## Parser Coverage
 
