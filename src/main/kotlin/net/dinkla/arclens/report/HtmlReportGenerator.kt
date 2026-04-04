@@ -419,7 +419,9 @@ class HtmlReportGenerator(
         private val JS_SCRIPTS =
             """
             // Initialize Mermaid
-            mermaid.initialize({ startOnLoad: true, theme: 'default' });
+            mermaid.initialize({ startOnLoad: false, theme: 'default' });
+            // Render only the initially visible diagram
+            mermaid.run({ querySelector: '.diagram-container.active .mermaid' });
 
             // Table sorting
             document.querySelectorAll('.sortable').forEach(table => {
@@ -469,8 +471,13 @@ class HtmlReportGenerator(
                     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                     document.querySelectorAll('.diagram-container').forEach(d => d.classList.remove('active'));
                     btn.classList.add('active');
-                    document.getElementById(btn.dataset.diagram).classList.add('active');
-                    mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+                    const container = document.getElementById(btn.dataset.diagram);
+                    container.classList.add('active');
+                    // Render if not yet processed by mermaid
+                    const pre = container.querySelector('pre.mermaid');
+                    if (pre) {
+                        mermaid.run({ nodes: [pre] });
+                    }
                 });
             });
             """.trimIndent()
