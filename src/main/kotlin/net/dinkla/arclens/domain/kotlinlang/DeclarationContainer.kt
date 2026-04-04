@@ -15,6 +15,9 @@ interface DeclarationContainer {
     val typeAliases: List<TypeAlias>
         get() = declarations.filterIsInstance<TypeAlias>()
 
+    val constructors: List<ConstructorSignature>
+        get() = declarations.filterIsInstance<ConstructorSignature>()
+
     val size: Int
         get() = declarations.size
 }

@@ -13,9 +13,9 @@ Done: LOC metrics, large class detection, long method detection, deep inheritanc
 
 | Construct | Priority | Effort | Notes |
 |-----------|----------|--------|-------|
-| `suspend` function types as parameters | Medium | Low | e.g. `suspend () -> Unit` |
-| Secondary constructors | Medium | Low | |
 | Context receivers | Low | Medium | Kotlin feature is deprecated in favor of context parameters |
+
+Done: `suspend` function types as parameters, secondary constructors.
 
 ## Performance
 

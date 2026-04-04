@@ -63,6 +63,21 @@ val myProperty: String = "is theft..."
 internal const val THE_ANSWER: Int = 42
 private val twentyOne = HelloWorld(21)
 
+fun withSuspend(action: suspend () -> Unit) {}
+
+fun withSuspendResult(action: suspend (Int) -> String): String = ""
+
+fun withSuspendNullableReturn(action: suspend (Int) -> String?): String = ""
+
+class WithSecondary(
+    val x: Int,
+    val y: Int,
+) {
+    constructor(x: Int) : this(x, 0)
+
+    private constructor() : this(0, 0)
+}
+
 fun main() {
     println("has no args and returns Unit implicitly")
     MathUtils.isZero(2.3)

@@ -4,6 +4,7 @@ import net.dinkla.arclens.domain.FilePath
 import net.dinkla.arclens.domain.kotlinlang.ClassModifier
 import net.dinkla.arclens.domain.kotlinlang.ClassParameter
 import net.dinkla.arclens.domain.kotlinlang.ClassSignature
+import net.dinkla.arclens.domain.kotlinlang.ConstructorSignature
 import net.dinkla.arclens.domain.kotlinlang.Declaration
 import net.dinkla.arclens.domain.kotlinlang.FunctionModifier
 import net.dinkla.arclens.domain.kotlinlang.FunctionParameter
@@ -30,6 +31,7 @@ import org.jetbrains.kotlin.psi.KtNullableType
 import org.jetbrains.kotlin.psi.KtObjectDeclaration
 import org.jetbrains.kotlin.psi.KtParameter
 import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.psi.KtSecondaryConstructor
 import org.jetbrains.kotlin.psi.KtTypeAlias
 import org.jetbrains.kotlin.psi.KtTypeReference
 import org.jetbrains.kotlin.psi.KtUserType
@@ -144,6 +146,7 @@ private fun extractBodyDeclarations(classOrObject: KtClassOrObject): List<Declar
             is KtProperty -> extractProperty(declaration)
             is KtClass -> extractClass(declaration)
             is KtObjectDeclaration -> extractObject(declaration)
+            is KtSecondaryConstructor -> extractSecondaryConstructor(declaration)
             else -> null
         }
     }
@@ -162,6 +165,20 @@ private fun extractClassParameter(parameter: KtParameter): ClassParameter {
             else -> null
         }
     return ClassParameter(name, type, visibilityModifier, propertyModifier)
+}
+
+/**
+ * Extract a ConstructorSignature from a KtSecondaryConstructor.
+ */
+private fun extractSecondaryConstructor(constructor: KtSecondaryConstructor): ConstructorSignature {
+    val parameters = constructor.valueParameters.map { extractFunctionParameter(it) }
+    val visibilityModifier = extractVisibilityModifier(constructor)
+    val lineCount = constructor.text.lines().size
+    return ConstructorSignature(
+        parameters = parameters,
+        visibilityModifier = visibilityModifier,
+        lineCount = lineCount,
+    )
 }
 
 /**
@@ -235,12 +252,14 @@ private fun extractTypeAlias(typeAlias: KtTypeAlias): TypeAlias {
  */
 private fun extractType(typeReference: KtTypeReference): Type {
     val typeElement = typeReference.typeElement
+    val isSuspend = typeReference.hasModifier(KtTokens.SUSPEND_KEYWORD)
+    val suspendPrefix = if (isSuspend) "suspend " else ""
     return when (typeElement) {
         is KtNullableType -> {
             val innerType = typeElement.innerType
             when (innerType) {
                 is KtUserType -> Type("${extractUserTypeName(innerType)}?")
-                is KtFunctionType -> Type("${extractFunctionTypeName(innerType)}?")
+                is KtFunctionType -> Type("$suspendPrefix${extractFunctionTypeName(innerType)}?")
                 else -> Type("${innerType?.text ?: "ERROR"}?")
             }
         }
@@ -250,7 +269,7 @@ private fun extractType(typeReference: KtTypeReference): Type {
         }
 
         is KtFunctionType -> {
-            Type(extractFunctionTypeName(typeElement))
+            Type("$suspendPrefix${extractFunctionTypeName(typeElement)}")
         }
 
         else -> {
