@@ -21,9 +21,28 @@ class HtmlReportGenerator(
         buildString {
             appendLine("<!DOCTYPE html>")
             appendLine("<html lang=\"en\">")
-            appendHead()
+            appendLine("<head>")
+            appendLine("<meta charset=\"UTF-8\">")
+            appendLine("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">")
+            appendLine("<title>${escapeHtml(options.title)}</title>")
+            appendLine("<style>")
+            appendLine(CSS_STYLES)
+            appendLine("</style>")
+            appendLine("</head>")
             appendLine("<body>")
-            appendNavigation()
+            appendLine("<nav class=\"navbar\">")
+            appendLine("<div class=\"nav-brand\">${escapeHtml(options.title)}</div>")
+            appendLine("<ul class=\"nav-links\">")
+            appendLine("<li><a href=\"#overview\">Overview</a></li>")
+            appendLine("<li><a href=\"#packages\">Packages</a></li>")
+            appendLine("<li><a href=\"#classes\">Classes</a></li>")
+            appendLine("<li><a href=\"#files\">Files</a></li>")
+            appendLine("<li><a href=\"#coupling\">Coupling</a></li>")
+            appendLine("<li><a href=\"#circular-deps\">Circular Deps</a></li>")
+            appendLine("<li><a href=\"#code-smells\">Code Smells</a></li>")
+            appendLine("<li><a href=\"#diagrams\">Diagrams</a></li>")
+            appendLine("</ul>")
+            appendLine("</nav>")
             appendLine("<main class=\"container\">")
             appendOverviewSection()
             appendPackagesSection()
@@ -31,6 +50,7 @@ class HtmlReportGenerator(
             appendFilesSection()
             appendCouplingSection()
             appendCircularDependenciesSection()
+            appendCodeSmellsSection()
             appendDiagramsSection()
             appendLine("</main>")
             appendLine("<footer class=\"footer\">")
@@ -43,32 +63,6 @@ class HtmlReportGenerator(
             appendLine("</body>")
             appendLine("</html>")
         }
-
-    private fun StringBuilder.appendHead() {
-        appendLine("<head>")
-        appendLine("<meta charset=\"UTF-8\">")
-        appendLine("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">")
-        appendLine("<title>${escapeHtml(options.title)}</title>")
-        appendLine("<style>")
-        appendLine(CSS_STYLES)
-        appendLine("</style>")
-        appendLine("</head>")
-    }
-
-    private fun StringBuilder.appendNavigation() {
-        appendLine("<nav class=\"navbar\">")
-        appendLine("<div class=\"nav-brand\">${escapeHtml(options.title)}</div>")
-        appendLine("<ul class=\"nav-links\">")
-        appendLine("<li><a href=\"#overview\">Overview</a></li>")
-        appendLine("<li><a href=\"#packages\">Packages</a></li>")
-        appendLine("<li><a href=\"#classes\">Classes</a></li>")
-        appendLine("<li><a href=\"#files\">Files</a></li>")
-        appendLine("<li><a href=\"#coupling\">Coupling</a></li>")
-        appendLine("<li><a href=\"#circular-deps\">Circular Deps</a></li>")
-        appendLine("<li><a href=\"#diagrams\">Diagrams</a></li>")
-        appendLine("</ul>")
-        appendLine("</nav>")
-    }
 
     private fun StringBuilder.appendOverviewSection() {
         appendLine("<section id=\"overview\" class=\"section\">")
@@ -101,6 +95,9 @@ class HtmlReportGenerator(
         appendLine("<li>Average instability: ${formatDouble(data.healthScore.averageInstability)}</li>")
         if (data.healthScore.highInstabilityPackages > 0) {
             appendLine("<li>High instability packages: ${data.healthScore.highInstabilityPackages}</li>")
+        }
+        if (data.healthScore.codeSmellCount > 0) {
+            appendLine("<li>Code smells detected: ${data.healthScore.codeSmellCount}</li>")
         }
         appendLine("</ul>")
         appendLine("</div>")
@@ -250,6 +247,45 @@ class HtmlReportGenerator(
             appendLine("<div class=\"alert alert-success\">")
             appendLine("<strong>No circular dependencies detected.</strong> Package structure is clean.</div>")
         }
+        appendLine("</section>")
+    }
+
+    private fun StringBuilder.appendCodeSmellsSection() {
+        appendLine("<section id=\"code-smells\" class=\"section\">")
+        appendLine("<h2>Code Smells</h2>")
+        if (data.totalCodeSmells == 0) {
+            appendLine("<div class=\"alert alert-success\">")
+            appendLine("<strong>No code smells detected.</strong></div>")
+        } else {
+            appendLine("<p class=\"section-description\">${data.totalCodeSmells} issue(s) found.</p>")
+        }
+        val lc = data.largeClasses
+        appendSmellTable(
+            "Large Classes (threshold: ${lc.threshold} declarations)",
+            lc.largeClasses,
+            listOf("Class" to "string", "Package" to "string", "Declarations" to "number"),
+        ) { cls -> listOf(cls.className, cls.packageName.name, cls.declarations.toString()) }
+
+        val lm = data.longMethods
+        appendSmellTable(
+            "Long Methods (threshold: ${lm.threshold} lines)",
+            lm.longMethods,
+            listOf("Function" to "string", "Class" to "string", "File" to "string", "Lines" to "number"),
+        ) { m -> listOf(m.functionName, m.className ?: "-", m.filePath.path, m.lineCount.toString()) }
+
+        val ui = data.unusedImports
+        appendSmellTable(
+            "Unused Imports",
+            ui.unusedImports,
+            listOf("File" to "string", "Import" to "string"),
+        ) { imp -> listOf(imp.filePath.path, imp.importName) }
+
+        val di = data.deepInheritance
+        appendSmellTable(
+            "Deep Inheritance (threshold: ${di.threshold} levels)",
+            di.deeplyInheritedClasses,
+            listOf("Class" to "string", "Package" to "string", "Depth" to "number"),
+        ) { cls -> listOf(cls.className, cls.packageName.name, cls.inheritanceDepth.toString()) }
         appendLine("</section>")
     }
 
@@ -446,4 +482,27 @@ class HtmlReportGenerator(
             });
             """.trimIndent()
     }
+}
+
+private fun <T> StringBuilder.appendSmellTable(
+    title: String,
+    items: List<T>,
+    columns: List<Pair<String, String>>,
+    rowMapper: (T) -> List<String>,
+) {
+    appendLine("<h3>$title</h3>")
+    if (items.isEmpty()) {
+        appendLine("<p>None detected.</p>")
+        return
+    }
+    appendLine("<div class=\"table-container\">")
+    appendLine("<table class=\"data-table sortable\"><thead><tr>")
+    columns.forEach { (name, sort) -> appendLine("<th data-sort=\"$sort\">${escapeHtml(name)}</th>") }
+    appendLine("</tr></thead><tbody>")
+    items.forEach { item ->
+        appendLine("<tr>")
+        rowMapper(item).forEach { cell -> appendLine("<td>${escapeHtml(cell)}</td>") }
+        appendLine("</tr>")
+    }
+    appendLine("</tbody></table></div>")
 }

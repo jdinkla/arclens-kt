@@ -4,11 +4,15 @@ import net.dinkla.arclens.analysis.AnalyzedPackage
 import net.dinkla.arclens.analysis.CircularDependenciesReport
 import net.dinkla.arclens.analysis.ClassStatistics
 import net.dinkla.arclens.analysis.DeclarationFilter
+import net.dinkla.arclens.analysis.DeepInheritanceReport
 import net.dinkla.arclens.analysis.FileStatistics
 import net.dinkla.arclens.analysis.ImportFilter
+import net.dinkla.arclens.analysis.LargeClassReport
+import net.dinkla.arclens.analysis.LongMethodReport
 import net.dinkla.arclens.analysis.MermaidCouplingDiagram
 import net.dinkla.arclens.analysis.PackageCouplingItem
 import net.dinkla.arclens.analysis.PackageImports
+import net.dinkla.arclens.analysis.UnusedImportsReport
 import net.dinkla.arclens.analysis.combinedReport
 import net.dinkla.arclens.analysis.findCircularDependencies
 import net.dinkla.arclens.analysis.mermaidClassDiagram
@@ -31,6 +35,10 @@ data class ReportData(
     val mermaidClassDiagram: String,
     val mermaidImportDiagram: String,
     val mermaidCouplingDiagram: String,
+    val largeClasses: LargeClassReport,
+    val longMethods: LongMethodReport,
+    val unusedImports: UnusedImportsReport,
+    val deepInheritance: DeepInheritanceReport,
 ) {
     val totalFiles: Int get() = project.files.size
     val totalPackages: Int get() = project.packages().size
@@ -39,6 +47,13 @@ data class ReportData(
     val totalProperties: Int get() = project.flatMap { it.properties }.size
 
     val healthScore: HealthScore get() = calculateHealthScore()
+
+    val totalCodeSmells: Int
+        get() =
+            largeClasses.totalLargeClasses +
+                longMethods.totalLongMethods +
+                unusedImports.totalUnusedImports +
+                deepInheritance.totalDeeplyInherited
 
     private fun calculateHealthScore(): HealthScore {
         val hasCircularDeps = circularDependencies.hasCycles
@@ -55,6 +70,7 @@ data class ReportData(
             circularDependencyCount = circularDependencies.totalCycles,
             averageInstability = avgInstability,
             highInstabilityPackages = highInstabilityCount,
+            codeSmellCount = totalCodeSmells,
         )
     }
 
@@ -83,6 +99,10 @@ data class ReportData(
                 mermaidClassDiagram = mermaidClassDiagram(project),
                 mermaidImportDiagram = mermaidImportsFlowDiagram(project, !options.includeAllLibraries),
                 mermaidCouplingDiagram = MermaidCouplingDiagram(combinedReport(imports)).generate(),
+                largeClasses = LargeClassReport.from(project, options.largeClassThreshold),
+                longMethods = LongMethodReport.from(project, options.longMethodThreshold),
+                unusedImports = UnusedImportsReport.from(project),
+                deepInheritance = DeepInheritanceReport.from(project, options.deepInheritanceThreshold),
             )
         }
     }
@@ -96,11 +116,13 @@ data class HealthScore(
     val circularDependencyCount: Int,
     val averageInstability: Double,
     val highInstabilityPackages: Int,
+    val codeSmellCount: Int = 0,
 ) {
     val overallStatus: HealthStatus
         get() =
             when {
                 hasCircularDependencies -> HealthStatus.WARNING
+                codeSmellCount > 0 -> HealthStatus.CAUTION
                 highInstabilityPackages > 0 -> HealthStatus.CAUTION
                 else -> HealthStatus.GOOD
             }
