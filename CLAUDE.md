@@ -71,6 +71,19 @@ net.dinkla.arclens
 - **Analysis Functions**: Top-level functions that transform domain objects
 - **Detection Reports**: `LargeClassReport`, `LongMethodReport`, `UnusedImportsReport`, `DeepInheritanceReport` — threshold-based code smell detection with `companion object { fun from() }` factories
 
+## Adding a New Analysis Feature
+
+Every new analysis must be wired into all of these — none are optional:
+
+1. **Analysis module** in `src/main/kotlin/.../analysis/` — data classes + `companion object { fun from() }`
+2. **Unit tests** in `src/test/kotlin/.../analysis/` — Kotest StringSpec
+3. **CLI command** in `src/main/kotlin/.../commands/` — extends `AbstractCommand`, registered in `Arclens.kt`
+4. **Command test** in `src/test/kotlin/.../commands/`
+5. **Gradle plugin** — add to `ArclensReportExtension`, `ArclensPlugin` (defaults), and `ArclensAnalyzeTask`
+6. **HTML report** — add to `ReportData`, `HtmlReportGenerator`, and navigation
+7. **justfile** — add to the `all-tasks` recipe
+8. **README.md** — update capabilities table, commands list, usage examples, Gradle config, and appendix
+
 ## Code Quality Rules
 
 Enforced by detekt (zero violations allowed):
