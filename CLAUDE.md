@@ -83,6 +83,7 @@ Every new analysis must be wired into all of these — none are optional:
 6. **HTML report** — add to `ReportData`, `HtmlReportGenerator`, and navigation
 7. **justfile** — add to the `all-tasks` recipe
 8. **README.md** — update capabilities table, commands list, usage examples, Gradle config, and appendix
+9. **`specs/roadmap.md`** — move the feature from open items to done
 
 ## Code Quality Rules
 
