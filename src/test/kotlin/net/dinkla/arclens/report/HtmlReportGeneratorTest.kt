@@ -113,14 +113,19 @@ private fun noCircularDeps() =
         packagesInCycles = emptySet(),
     )
 
-private fun baseReportData(
-    largeClasses: LargeClassReport =
+private data class CodeSmellReports(
+    val largeClasses: LargeClassReport =
         LargeClassReport(threshold = 10, largeClasses = emptyList(), totalLargeClasses = 0),
-    longMethods: LongMethodReport = LongMethodReport(threshold = 60, longMethods = emptyList(), totalLongMethods = 0),
-    deepInheritance: DeepInheritanceReport =
+    val longMethods: LongMethodReport =
+        LongMethodReport(threshold = 60, longMethods = emptyList(), totalLongMethods = 0),
+    val deepInheritance: DeepInheritanceReport =
         DeepInheritanceReport(threshold = 3, deeplyInheritedClasses = emptyList(), totalDeeplyInherited = 0),
-    complexMethods: ComplexMethodReport =
+    val complexMethods: ComplexMethodReport =
         ComplexMethodReport(threshold = 15, complexMethods = emptyList(), totalComplexMethods = 0),
+)
+
+private fun baseReportData(
+    smells: CodeSmellReports = CodeSmellReports(),
     circularDependencies: CircularDependenciesReport = noCircularDeps(),
     couplingData: List<PackageCouplingItem> = listOf(couplingAlpha, couplingBeta),
 ) = ReportData(
@@ -133,10 +138,10 @@ private fun baseReportData(
     mermaidClassDiagram = "classDiagram\n  Alpha --|> Base",
     mermaidImportDiagram = "flowchart LR\n  alpha --> beta",
     mermaidCouplingDiagram = "flowchart LR\n  alpha -- 1 --> beta",
-    largeClasses = largeClasses,
-    longMethods = longMethods,
-    deepInheritance = deepInheritance,
-    complexMethods = complexMethods,
+    largeClasses = smells.largeClasses,
+    longMethods = smells.longMethods,
+    deepInheritance = smells.deepInheritance,
+    complexMethods = smells.complexMethods,
 )
 
 private val defaultOptions = ReportOptions(title = "Test Report")
@@ -312,7 +317,7 @@ class HtmlReportGeneratorTest :
             // Given
             val largeClass = LargeClass(className = "BigClass", packageName = pkgAlpha, declarations = 20)
             val report = LargeClassReport(threshold = 10, largeClasses = listOf(largeClass), totalLargeClasses = 1)
-            val data = baseReportData(largeClasses = report)
+            val data = baseReportData(smells = CodeSmellReports(largeClasses = report))
             // When
             val html = HtmlReportGenerator(data, defaultOptions).generate()
             // Then
@@ -330,7 +335,7 @@ class HtmlReportGeneratorTest :
                     lineCount = 80,
                 )
             val report = LongMethodReport(threshold = 60, longMethods = listOf(longMethod), totalLongMethods = 1)
-            val data = baseReportData(longMethods = report)
+            val data = baseReportData(smells = CodeSmellReports(longMethods = report))
             // When
             val html = HtmlReportGenerator(data, defaultOptions).generate()
             // Then
@@ -347,7 +352,7 @@ class HtmlReportGeneratorTest :
                     deeplyInheritedClasses = listOf(deepClass),
                     totalDeeplyInherited = 1,
                 )
-            val data = baseReportData(deepInheritance = report)
+            val data = baseReportData(smells = CodeSmellReports(deepInheritance = report))
             // When
             val html = HtmlReportGenerator(data, defaultOptions).generate()
             // Then
@@ -366,7 +371,7 @@ class HtmlReportGeneratorTest :
                 )
             val report =
                 ComplexMethodReport(threshold = 15, complexMethods = listOf(complexMethod), totalComplexMethods = 1)
-            val data = baseReportData(complexMethods = report)
+            val data = baseReportData(smells = CodeSmellReports(complexMethods = report))
             // When
             val html = HtmlReportGenerator(data, defaultOptions).generate()
             // Then
@@ -378,7 +383,7 @@ class HtmlReportGeneratorTest :
             // Given
             val largeClass = LargeClass(className = "BigClass", packageName = pkgAlpha, declarations = 20)
             val report = LargeClassReport(threshold = 10, largeClasses = listOf(largeClass), totalLargeClasses = 1)
-            val data = baseReportData(largeClasses = report)
+            val data = baseReportData(smells = CodeSmellReports(largeClasses = report))
             // When
             val html = HtmlReportGenerator(data, defaultOptions).generate()
             // Then

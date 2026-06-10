@@ -66,12 +66,16 @@ private fun cleanCircularDeps() =
         packagesInCycles = emptySet(),
     )
 
+private data class SmellReports(
+    val largeClasses: LargeClassReport = emptyLargeClassReport(),
+    val longMethods: LongMethodReport = emptyLongMethodReport(),
+    val deepInheritance: DeepInheritanceReport = emptyDeepInheritanceReport(),
+    val complexMethods: ComplexMethodReport = emptyComplexMethodReport(),
+)
+
 private fun reportData(
     project: Project = sampleProject,
-    largeClasses: LargeClassReport = emptyLargeClassReport(),
-    longMethods: LongMethodReport = emptyLongMethodReport(),
-    deepInheritance: DeepInheritanceReport = emptyDeepInheritanceReport(),
-    complexMethods: ComplexMethodReport = emptyComplexMethodReport(),
+    smells: SmellReports = SmellReports(),
     circularDependencies: CircularDependenciesReport = cleanCircularDeps(),
     couplingData: List<PackageCouplingItem> = emptyList(),
 ) = ReportData(
@@ -84,10 +88,10 @@ private fun reportData(
     mermaidClassDiagram = "",
     mermaidImportDiagram = "",
     mermaidCouplingDiagram = "",
-    largeClasses = largeClasses,
-    longMethods = longMethods,
-    deepInheritance = deepInheritance,
-    complexMethods = complexMethods,
+    largeClasses = smells.largeClasses,
+    longMethods = smells.longMethods,
+    deepInheritance = smells.deepInheritance,
+    complexMethods = smells.complexMethods,
 )
 
 class ReportDataTest :
@@ -137,7 +141,16 @@ class ReportDataTest :
             val lm = LongMethodReport(60, emptyList(), 0)
             val di = DeepInheritanceReport(3, emptyList(), 0)
             val cm = ComplexMethodReport(15, emptyList(), 0)
-            val data = reportData(largeClasses = lc, longMethods = lm, deepInheritance = di, complexMethods = cm)
+            val data =
+                reportData(
+                    smells =
+                        SmellReports(
+                            largeClasses = lc,
+                            longMethods = lm,
+                            deepInheritance = di,
+                            complexMethods = cm,
+                        ),
+                )
             // When / Then
             data.totalCodeSmells shouldBe 1
         }
@@ -168,7 +181,7 @@ class ReportDataTest :
         "overallStatus should be CAUTION when code smells exist" {
             // Given
             val lc = LargeClassReport(10, listOf(LargeClass("BigClass", pkgA, 20)), 1)
-            val data = reportData(largeClasses = lc)
+            val data = reportData(smells = SmellReports(largeClasses = lc))
             // When / Then
             data.healthScore.overallStatus shouldBe HealthStatus.CAUTION
         }
