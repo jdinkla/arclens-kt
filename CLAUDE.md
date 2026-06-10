@@ -80,10 +80,11 @@ Every new analysis must be wired into all of these — none are optional:
 3. **CLI command** in `src/main/kotlin/.../commands/` — extends `AbstractCommand`, registered in `Arclens.kt`
 4. **Command test** in `src/test/kotlin/.../commands/`
 5. **Gradle plugin** — add to `ArclensReportExtension`, `ArclensPlugin` (defaults), and `ArclensAnalyzeTask`
-6. **HTML report** — add to `ReportData`, `HtmlReportGenerator`, and navigation
-7. **justfile** — add to the `all-tasks` recipe
-8. **README.md** — update capabilities table, commands list, usage examples, Gradle config, and appendix
-9. **`specs/roadmap.md`** — move the feature from open items to done
+6. **Gradle plugin tests** in `gradle-plugin/src/test/kotlin/.../gradle/` — extend `ArclensPluginTest` (ProjectBuilder) with the new report default, and add functional coverage for the generated report file in `gradle-plugin/src/functionalTest/kotlin/.../gradle/ArclensPluginFunctionalTest.kt` (TestKit)
+7. **HTML report** — add to `ReportData`, `HtmlReportGenerator`, and navigation
+8. **justfile** — add to the `all-tasks` recipe
+9. **README.md** — update capabilities table, commands list, usage examples, Gradle config, and appendix
+10. **`specs/roadmap.md`** — move the feature from open items to done
 
 ## Code Quality Rules
 
