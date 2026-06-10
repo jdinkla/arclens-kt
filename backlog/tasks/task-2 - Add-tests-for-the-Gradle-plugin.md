@@ -1,9 +1,10 @@
 ---
 id: TASK-2
 title: Add tests for the Gradle plugin
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-06-10 11:41'
+updated_date: '2026-06-10 12:06'
 labels:
   - testing
   - gradle-plugin
@@ -20,7 +21,7 @@ The gradle-plugin subproject (~500 lines: ArclensExtension, ArclensPlugin, Arcle
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Unit tests verify ArclensExtension defaults and ArclensPlugin task registration (ProjectBuilder)
-- [ ] #2 Functional test applies the plugin to a sample project and runs parse/analyze tasks (TestKit)
-- [ ] #3 CLAUDE.md 'Adding a New Analysis Feature' checklist gains a Gradle plugin test step
+- [x] #1 Unit tests verify ArclensExtension defaults and ArclensPlugin task registration (ProjectBuilder)
+- [x] #2 Functional test applies the plugin to a sample project and runs parse/analyze tasks (TestKit)
+- [x] #3 CLAUDE.md 'Adding a New Analysis Feature' checklist gains a Gradle plugin test step
 <!-- AC:END -->
