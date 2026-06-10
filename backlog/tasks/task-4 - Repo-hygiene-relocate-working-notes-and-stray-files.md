@@ -1,9 +1,10 @@
 ---
 id: TASK-4
 title: 'Repo hygiene: relocate working notes and stray files'
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-06-10 11:41'
+updated_date: '2026-06-10 12:10'
 labels:
   - chore
 dependencies: []
@@ -19,6 +20,6 @@ PROMPT.md and PROMPT_FOR_ANALYSIS.md are tracked at the repo root but read like 
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 PROMPT.md and PROMPT_FOR_ANALYSIS.md moved to an appropriate directory or deleted
-- [ ] #2 loc_timeline.png either committed in a sensible location or removed
+- [x] #1 PROMPT.md and PROMPT_FOR_ANALYSIS.md moved to an appropriate directory or deleted
+- [x] #2 loc_timeline.png either committed in a sensible location or removed
 <!-- AC:END -->
