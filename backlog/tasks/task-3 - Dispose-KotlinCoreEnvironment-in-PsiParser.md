@@ -1,9 +1,10 @@
 ---
 id: TASK-3
 title: Dispose KotlinCoreEnvironment in PsiParser
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-06-10 11:41'
+updated_date: '2026-06-10 12:09'
 labels:
   - bug
   - parser
