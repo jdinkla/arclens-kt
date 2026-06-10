@@ -1,9 +1,10 @@
 ---
 id: TASK-1
 title: Add snapshot tests for HTML report package
-status: To Do
+status: Done
 assignee: []
 created_date: '2026-06-10 11:41'
+updated_date: '2026-06-10 11:56'
 labels:
   - testing
   - report
@@ -20,7 +21,7 @@ The report package has 0% test coverage on 390 lines, and HtmlReportGenerator.kt
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Snapshot/regression test covers HtmlReportGenerator.generate() output for a representative ReportData fixture
-- [ ] #2 Tests cover all report sections incl. code smells and diagrams
-- [ ] #3 report package line coverage substantially above 0% in jacoco report
+- [x] #1 Snapshot/regression test covers HtmlReportGenerator.generate() output for a representative ReportData fixture
+- [x] #2 Tests cover all report sections incl. code smells and diagrams
+- [x] #3 report package line coverage substantially above 0% in jacoco report
 <!-- AC:END -->
