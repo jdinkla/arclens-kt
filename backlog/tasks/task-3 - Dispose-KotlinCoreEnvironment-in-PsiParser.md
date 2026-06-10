@@ -25,4 +25,5 @@ PsiParser creates a KotlinCoreEnvironment with Disposer.newDisposable() (PsiPars
 - [ ] #2 All call sites (CLI Parse command, ParallelParsing, Gradle tasks) release the parser
 - [ ] #3 Existing tests still pass
 - [ ] #4 1:true
+- [ ] #5 2:true
 <!-- AC:END -->
