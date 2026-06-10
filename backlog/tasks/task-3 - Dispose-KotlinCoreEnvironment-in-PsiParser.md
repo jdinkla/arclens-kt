@@ -24,4 +24,5 @@ PsiParser creates a KotlinCoreEnvironment with Disposer.newDisposable() (PsiPars
 - [ ] #1 Disposable created in createKotlinCoreEnvironment is disposed when the parser is no longer needed
 - [ ] #2 All call sites (CLI Parse command, ParallelParsing, Gradle tasks) release the parser
 - [ ] #3 Existing tests still pass
+- [ ] #4 1:true
 <!-- AC:END -->
