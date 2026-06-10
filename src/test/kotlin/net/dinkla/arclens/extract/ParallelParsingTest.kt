@@ -58,10 +58,12 @@ class ParallelParsingTest :
                 File(tempDir, "Hello.kt").apply {
                     writeText("package test\n\nfun hello() = \"hello\"")
                 }
-            val parser = PsiParser()
 
             // When
-            val results = parseFiles(listOf(file.absolutePath), tempDir.absolutePath, parser)
+            val results =
+                PsiParser().use { parser ->
+                    parseFiles(listOf(file.absolutePath), tempDir.absolutePath, parser)
+                }
 
             // Then
             results shouldHaveSize 1
@@ -76,11 +78,11 @@ class ParallelParsingTest :
         }
 
         "parseFiles should return failure for non-existent files" {
-            // Given
-            val parser = PsiParser()
-
             // When
-            val results = parseFiles(listOf("/nonexistent/Fake.kt"), "/nonexistent", parser)
+            val results =
+                PsiParser().use { parser ->
+                    parseFiles(listOf("/nonexistent/Fake.kt"), "/nonexistent", parser)
+                }
 
             // Then
             results shouldHaveSize 1
@@ -88,11 +90,11 @@ class ParallelParsingTest :
         }
 
         "parseFiles should handle empty file list" {
-            // Given
-            val parser = PsiParser()
-
             // When
-            val results = parseFiles(emptyList(), "/base", parser)
+            val results =
+                PsiParser().use { parser ->
+                    parseFiles(emptyList(), "/base", parser)
+                }
 
             // Then
             results shouldHaveSize 0
@@ -112,15 +114,16 @@ class ParallelParsingTest :
                 File(tempDir, "B.kt").apply {
                     writeText("package test\n\nfun b() = 2")
                 }
-            val parser = PsiParser()
 
             // When
             val results =
-                parseFiles(
-                    listOf(file1.absolutePath, file2.absolutePath),
-                    tempDir.absolutePath,
-                    parser,
-                )
+                PsiParser().use { parser ->
+                    parseFiles(
+                        listOf(file1.absolutePath, file2.absolutePath),
+                        tempDir.absolutePath,
+                        parser,
+                    )
+                }
 
             // Then
             results shouldHaveSize 2

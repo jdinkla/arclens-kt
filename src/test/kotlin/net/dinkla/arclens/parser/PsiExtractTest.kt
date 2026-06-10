@@ -23,6 +23,8 @@ class PsiExtractTest :
     StringSpec({
         val parser = PsiParser()
 
+        afterSpec { parser.close() }
+
         fun parseFile(source: String) = extractKotlinFile(parser.parseText(source), FilePath("/test.kt"))
 
         fun parseDeclarations(source: String) = parseFile(source).declarations
@@ -584,5 +586,40 @@ class PsiExtractTest :
             val function = parseDeclarations(source).first() as FunctionSignature
             // Then
             function.cyclomaticComplexity shouldBe 3
+        }
+
+        // ==================== Closeable / resource management ====================
+
+        "close should be idempotent when environment was used" {
+            // Given
+            val p = PsiParser()
+            p.parseText("fun f() {}")
+
+            // When / Then — no exception on first or second close
+            p.close()
+            p.close()
+        }
+
+        "close should be safe when environment was never initialized" {
+            // Given
+            val p = PsiParser()
+
+            // When / Then — no exception even though parseText was never called
+            p.close()
+        }
+
+        "a new PsiParser instance is constructible after another has been closed" {
+            // Given
+            val p1 = PsiParser()
+            p1.parseText("fun first() {}")
+            p1.close()
+
+            // When
+            val p2 = PsiParser()
+            val result = p2.parseText("fun second() {}")
+            p2.close()
+
+            // Then
+            result.name shouldBe "temp.kt"
         }
     })

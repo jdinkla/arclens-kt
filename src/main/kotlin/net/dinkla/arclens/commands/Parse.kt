@@ -56,17 +56,17 @@ class Parse : CliktCommand(name = "parse") {
         help = "Force full parse, ignoring cached results",
     ).flag(default = false)
 
-    private val parser: PsiParser by lazy { PsiParser() }
-
     override fun run() {
-        if (!full && target?.exists() == true) {
-            runIncremental()
-        } else {
-            runFull()
+        PsiParser().use { parser ->
+            if (!full && target?.exists() == true) {
+                runIncremental(parser)
+            } else {
+                runFull(parser)
+            }
         }
     }
 
-    private fun runFull() {
+    private fun runFull(parser: PsiParser) {
         val allSources = listOf(source) + (additionalSources ?: emptyList())
         val allFiles =
             allSources.flatMap { dir ->
@@ -80,7 +80,7 @@ class Parse : CliktCommand(name = "parse") {
         writeOutput(buildProject(allSources, successFiles))
     }
 
-    private fun runIncremental() {
+    private fun runIncremental(parser: PsiParser) {
         val allSources = listOf(source) + (additionalSources ?: emptyList())
         val cachedProject = loadCachedProject()
 

@@ -20,8 +20,6 @@ import java.io.File
  * Task that parses Kotlin source files and generates an analysis model.
  */
 abstract class ArclensParseTask : DefaultTask() {
-    private val parser = PsiParser()
-
     @get:Input
     abstract val sourceDirs: ListProperty<File>
 
@@ -36,35 +34,40 @@ abstract class ArclensParseTask : DefaultTask() {
             return
         }
 
-        val allFiles = dirs.flatMap { readFiles(it) }
-        val successCount = allFiles.count { it.isSuccess }
-        val failureCount = allFiles.count { it.isFailure }
+        PsiParser().use { parser ->
+            val allFiles = dirs.flatMap { readFiles(it, parser) }
+            val successCount = allFiles.count { it.isSuccess }
+            val failureCount = allFiles.count { it.isFailure }
 
-        logger.lifecycle("Arclens: Parsed $successCount files, $failureCount failures")
+            logger.lifecycle("Arclens: Parsed $successCount files, $failureCount failures")
 
-        if (failureCount > 0) {
-            allFiles.filter { it.isFailure }.forEach {
-                logger.warn("Arclens parse error: ${it.exceptionOrNull()?.message}")
+            if (failureCount > 0) {
+                allFiles.filter { it.isFailure }.forEach {
+                    logger.warn("Arclens parse error: ${it.exceptionOrNull()?.message}")
+                }
             }
+
+            val project = toProject(dirs, allFiles)
+            val json = Json.encodeToString(project)
+
+            val output = outputFile.get().asFile
+            output.parentFile.mkdirs()
+            output.writeText(json)
+
+            logger.lifecycle("Arclens: Model written to ${output.absolutePath}")
         }
-
-        val project = toProject(dirs, allFiles)
-        val json = Json.encodeToString(project)
-
-        val output = outputFile.get().asFile
-        output.parentFile.mkdirs()
-        output.writeText(json)
-
-        logger.lifecycle("Arclens: Model written to ${output.absolutePath}")
     }
 
-    private fun readFiles(directory: File): List<Result<KotlinFile>> {
+    private fun readFiles(
+        directory: File,
+        parser: PsiParser,
+    ): List<Result<KotlinFile>> {
         val files = getAllKotlinFiles(directory)
         return runBlocking(Dispatchers.Default) {
             files
                 .map { fileName ->
                     async {
-                        extractFileInfo(fileName, directory.absolutePath)
+                        extractFileInfo(fileName, directory.absolutePath, parser)
                     }
                 }.map { it.await() }
         }
@@ -73,6 +76,7 @@ abstract class ArclensParseTask : DefaultTask() {
     private fun extractFileInfo(
         fileName: String,
         prefix: String,
+        parser: PsiParser,
     ): Result<KotlinFile> =
         try {
             parser.parseFile(fileName, prefix)
