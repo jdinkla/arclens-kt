@@ -26,4 +26,5 @@ PsiParser creates a KotlinCoreEnvironment with Disposer.newDisposable() (PsiPars
 - [ ] #3 Existing tests still pass
 - [ ] #4 1:true
 - [ ] #5 2:true
+- [ ] #6 3:true
 <!-- AC:END -->
