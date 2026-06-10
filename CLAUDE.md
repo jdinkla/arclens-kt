@@ -156,3 +156,14 @@ You MUST read the overview resource to understand the complete workflow. The inf
 </CRITICAL_INSTRUCTION>
 
 <!-- BACKLOG.MD MCP GUIDELINES END -->
+
+### Model Routing for Tasks
+
+Every backlog task gets a model recommendation as a `model:<name>` label (e.g. `model:sonnet`), set at task creation. Tasks are executed by subagents spawned with that model as override. Route to the cheapest model adequate for the task:
+
+- `model:haiku` — mechanical chores: renames, file moves, doc-only edits
+- `model:sonnet` — pattern-following work: new analysis modules per the checklist above, tests, well-specified formats
+- `model:opus` — work spanning subsystems or with real failure-mode design: Gradle plugin internals, CI gating semantics
+- `model:fable` — design-heavy or architecturally open problems: design spikes, model/schema changes with wide blast radius
+
+If a task has no `model:` label, add one before executing it.
