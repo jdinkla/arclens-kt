@@ -2,13 +2,14 @@ package net.dinkla.arclens.parser
 
 import net.dinkla.arclens.domain.FilePath
 import net.dinkla.arclens.domain.kotlinlang.KotlinFile
+import org.jetbrains.kotlin.CoreEnvironmentDeprecation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
+import org.jetbrains.kotlin.cli.create
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.com.intellij.openapi.Disposable
 import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
 import org.jetbrains.kotlin.com.intellij.psi.PsiFileFactory
-import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.idea.KotlinFileType
 import org.jetbrains.kotlin.psi.KtFile
@@ -77,11 +78,10 @@ class PsiParser : Closeable {
     }
 
     companion object {
+        // PSI parsing still needs KotlinCoreEnvironment; keep its API opt-in scoped to initialization.
+        @OptIn(CoreEnvironmentDeprecation::class)
         private fun createKotlinCoreEnvironment(disposable: Disposable): KotlinCoreEnvironment {
-            val configuration =
-                CompilerConfiguration().apply {
-                    put(CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
-                }
+            val configuration = CompilerConfiguration.create(messageCollector = MessageCollector.NONE)
             return KotlinCoreEnvironment.createForProduction(
                 disposable,
                 configuration,
