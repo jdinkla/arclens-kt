@@ -14,11 +14,13 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import java.io.File
 
 /**
  * Task that parses Kotlin source files and generates an analysis model.
  */
+@DisableCachingByDefault(because = "Parsing is not worth caching; outputs are rebuilt locally")
 abstract class ArclensParseTask : DefaultTask() {
     @get:Input
     abstract val sourceDirs: ListProperty<File>

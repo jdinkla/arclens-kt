@@ -67,3 +67,19 @@ tasks.check {
 kotlin {
     jvmToolchain(21)
 }
+
+// ktlint's CLI (even 1.8.0) still depends on logback 1.3.x, which has open CVEs.
+// Force the patched logback line on ktlint's own resolution configurations.
+configurations
+    .matching { it.name.startsWith("ktlint") }
+    .configureEach {
+        resolutionStrategy.eachDependency {
+            if (requested.group == "ch.qos.logback") {
+                useVersion(
+                    libs.versions.logback.classic
+                        .get(),
+                )
+                because("logback < 1.5.34 is affected by GHSA-p47f-322f-whfh and GHSA-jhq6-gfmj-v8fx")
+            }
+        }
+    }

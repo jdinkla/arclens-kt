@@ -22,14 +22,19 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import java.io.File
 
 /**
  * Task that runs all configured arclens analyses on a parsed model.
  */
+@DisableCachingByDefault(because = "Report generation is not worth caching")
 abstract class ArclensAnalyzeTask : DefaultTask() {
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     abstract val modelFile: RegularFileProperty
 
     @get:OutputDirectory
