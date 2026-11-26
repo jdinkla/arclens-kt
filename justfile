@@ -21,6 +21,10 @@ clean:
 lint:
     @ktlint -F src/
 
+# list open Dependabot alerts (GitHub's view of the pushed default branch, incl. build-tool deps)
+alerts:
+    @out=$(gh api --paginate '/repos/{owner}/{repo}/dependabot/alerts?state=open&per_page=100' --jq '.[] | [.security_advisory.severity, .dependency.package.name, .security_vulnerability.vulnerable_version_range, (.security_vulnerability.first_patched_version.identifier // "-"), .dependency.manifest_path] | @tsv' | sort -u); if [ -n "$out" ]; then echo "$out" | column -t -s "$(printf '\t')"; else echo "No open Dependabot alerts"; fi
+
 # refresh the dependencies
 refresh:
     @{{gradle}} refreshVersions       

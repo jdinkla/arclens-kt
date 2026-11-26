@@ -11,8 +11,11 @@ import net.dinkla.arclens.utilities.getAllKotlinFiles
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
-import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.IgnoreEmptyDirectories
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
 import java.io.File
@@ -22,7 +25,11 @@ import java.io.File
  */
 @DisableCachingByDefault(because = "Parsing is not worth caching; outputs are rebuilt locally")
 abstract class ArclensParseTask : DefaultTask() {
-    @get:Input
+    // Tracked as file inputs so edits inside the directories invalidate the model.
+    // ABSOLUTE because the model records absolute source paths.
+    @get:InputFiles
+    @get:IgnoreEmptyDirectories
+    @get:PathSensitive(PathSensitivity.ABSOLUTE)
     abstract val sourceDirs: ListProperty<File>
 
     @get:OutputFile

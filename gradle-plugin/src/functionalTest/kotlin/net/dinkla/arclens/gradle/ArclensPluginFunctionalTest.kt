@@ -70,6 +70,52 @@ class ArclensPluginFunctionalTest :
             File(projectDir, "build/arclens/model.json").shouldExist()
         }
 
+        "arclensParse is up-to-date when sources are unchanged" {
+            // Given
+            val projectDir = newProject()
+            runner(projectDir, "arclensParse").build()
+
+            // When
+            val result = runner(projectDir, "arclensParse").build()
+
+            // Then
+            result.task(":arclensParse")?.outcome shouldBe TaskOutcome.UP_TO_DATE
+        }
+
+        "arclensParse re-runs when a source file is added" {
+            // Given
+            val projectDir = newProject()
+            runner(projectDir, "arclensParse").build()
+            File(projectDir, "src/main/kotlin/com/example/Farewell.kt").writeText(
+                """
+                package com.example
+
+                class Farewell
+                """.trimIndent(),
+            )
+
+            // When
+            val result = runner(projectDir, "arclensParse").build()
+
+            // Then
+            result.task(":arclensParse")?.outcome shouldBe TaskOutcome.SUCCESS
+            result.output shouldContain "Arclens: Parsed 2 files"
+        }
+
+        "arclensParse re-runs when a source file changes" {
+            // Given
+            val projectDir = newProject()
+            runner(projectDir, "arclensParse").build()
+            File(projectDir, "src/main/kotlin/com/example/Greeter.kt").appendText("\n\nclass Second\n")
+
+            // When
+            val result = runner(projectDir, "arclensParse").build()
+
+            // Then
+            result.task(":arclensParse")?.outcome shouldBe TaskOutcome.SUCCESS
+            File(projectDir, "build/arclens/model.json").readText() shouldContain "Second"
+        }
+
         "arclensAnalyze depends on parse and generates the configured reports" {
             // Given
             val projectDir = newProject()
